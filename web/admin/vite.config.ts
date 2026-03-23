@@ -10,14 +10,18 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 3001,
     proxy: {
       '/admin': {
-        target: 'http://localhost:8083',
+        target: process.env.VITE_API_URL || 'http://admin:8083',
+        changeOrigin: true,
+      },
+      '/mining': {
+        target: process.env.VITE_MINER_URL || 'http://miner:8082',
         changeOrigin: true,
       },
       '/ws': {
-        target: 'ws://localhost:8083',
+        target: process.env.VITE_WS_URL || 'ws://admin:8083',
         ws: true,
       },
     },

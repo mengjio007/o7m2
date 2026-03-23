@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CharacterList } from '@/components/Trading/CharacterList'
 import { KLineChart } from '@/components/Chart/KLineChart'
 import { OrderBook } from '@/components/Trading/OrderBook'
@@ -7,6 +7,8 @@ import { TradingForm } from '@/components/Trading/TradingForm'
 import { MyPositions } from '@/components/Trading/MyPositions'
 import { MyOrders } from '@/components/Trading/MyOrders'
 import { EventModal } from '@/components/Event/EventModal'
+import { useAuthStore } from '@/store/auth'
+import { accountApi } from '@/services/api'
 
 interface Character {
   id: string
@@ -30,13 +32,23 @@ const categoryLabels = {
 }
 
 export function TradingDashboard() {
+  const { isAuthenticated, user, logout, setAccount } = useAuthStore()
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
   const [ticker, setTicker] = useState<Ticker | null>(null)
   const [showEvent, setShowEvent] = useState(false)
 
+  // Load account info when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      accountApi.getAccount().then((res: any) => {
+        setAccount(res.account)
+      }).catch(console.error)
+    }
+  }, [isAuthenticated])
+
   return (
     <div className="h-screen flex flex-col">
-      {/* 可爱的 Header */}
+      {/* Header */}
       <header className="h-16 bg-white/80 backdrop-blur-sm border-b-2 border-primary/20 flex items-center px-6 justify-between">
         <div className="flex items-center gap-6">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -58,15 +70,27 @@ export function TradingDashboard() {
           >
             🔔 全站事件
           </button>
-          <a href="/login" className="btn-primary text-sm">
-            登录 ✌️
-          </a>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-foreground/60">👋 {user?.username}</span>
+              <button 
+                onClick={logout}
+                className="px-4 py-2 text-sm text-foreground/60 hover:text-foreground"
+              >
+                退出
+              </button>
+            </div>
+          ) : (
+            <a href="/login" className="btn-primary text-sm">
+              登录 ✌️
+            </a>
+          )}
         </div>
       </header>
 
-      {/* 主内容区 */}
+      {/* Main content */}
       <div className="flex-1 flex overflow-hidden p-4 gap-4">
-        {/* 左侧：角色列表 */}
+        {/* Left: Character List */}
         <aside className="w-72 card-cute overflow-hidden flex flex-col">
           <CharacterList 
             onSelect={setSelectedCharacter}
@@ -74,9 +98,8 @@ export function TradingDashboard() {
           />
         </aside>
 
-        {/* 中间：K线 + 交易表单 */}
+        {/* Center: Chart + Trading Form */}
         <main className="flex-1 flex flex-col gap-4">
-          {/* 价格头部 */}
           {selectedCharacter ? (
             <div className="card-cute p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -114,18 +137,16 @@ export function TradingDashboard() {
             </div>
           )}
 
-          {/* K线图 */}
           <div className="flex-1 min-h-0 card-cute overflow-hidden">
             <KLineChart characterId={selectedCharacter?.id} />
           </div>
 
-          {/* 交易表单 */}
           <div className="h-48 card-cute">
             <TradingForm character={selectedCharacter} ticker={ticker} />
           </div>
         </main>
 
-        {/* 右侧：订单簿 + 成交 */}
+        {/* Right: OrderBook + Recent Trades */}
         <aside className="w-80 flex flex-col gap-4">
           <div className="flex-1 min-h-0 card-cute overflow-hidden">
             <OrderBook characterId={selectedCharacter?.id} />
@@ -136,7 +157,7 @@ export function TradingDashboard() {
         </aside>
       </div>
 
-      {/* 底部：持仓 + 委托 */}
+      {/* Bottom: Positions + Orders */}
       <footer className="h-48 mx-4 mb-4 flex gap-4">
         <div className="flex-1 card-cute overflow-hidden">
           <MyPositions />
@@ -146,7 +167,6 @@ export function TradingDashboard() {
         </div>
       </footer>
 
-      {/* 事件弹窗 */}
       {showEvent && (
         <EventModal onClose={() => setShowEvent(false)} />
       )}

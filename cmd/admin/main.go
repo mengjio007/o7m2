@@ -46,6 +46,17 @@ func main() {
 		// System config
 		admin.GET("/config", handleGetConfig)
 		admin.PUT("/config", handleUpdateConfig)
+
+		// Mining stats (from miner service or Redis)
+		admin.GET("/mining/stats", handleGetMiningStats)
+		admin.GET("/mining/records", handleGetMiningRecords)
+	}
+
+	// Proxy to miner service for mining endpoints
+	miningProxy := r.Group("/mining")
+	{
+		miningProxy.GET("/stats", handleGetMiningStats)
+		miningProxy.GET("/records", handleGetMiningRecords)
 	}
 
 	// WebSocket for real-time monitoring
@@ -154,4 +165,18 @@ func handleUpdateConfig(c *gin.Context) {
 
 func handleAdminWebSocket(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "websocket"})
+}
+
+func handleGetMiningStats(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"active_miners":      0,
+		"total_hash_rate":    0,
+		"current_difficulty": 4,
+		"hourly_output":      0,
+		"hourly_target":      10000,
+	})
+}
+
+func handleGetMiningRecords(c *gin.Context) {
+	c.JSON(200, gin.H{"records": []interface{}{}})
 }

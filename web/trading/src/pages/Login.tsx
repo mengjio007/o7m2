@@ -1,19 +1,24 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/auth'
 
 export function Login() {
   const navigate = useNavigate()
+  const { login, loading } = useAuthStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    setError('')
+    
+    try {
+      await login(email, password)
       navigate('/')
-    }, 1000)
+    } catch (err: any) {
+      setError(err.message || '登录失败，请重试')
+    }
   }
 
   return (
@@ -37,6 +42,12 @@ export function Login() {
 
         {/* 登录卡片 */}
         <div className="card-cute p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-cute text-danger text-sm">
+              ❌ {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-foreground/70 mb-2">

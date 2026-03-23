@@ -1,25 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/auth'
 
 export function Register() {
   const navigate = useNavigate()
+  const { register, loading } = useAuthStore()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
+    
     if (password !== confirmPassword) {
-      alert('两次密码不一致哦~')
+      setError('两次密码不一致哦~')
       return
     }
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      navigate('/login')
-    }, 1000)
+
+    try {
+      await register(username, email, password)
+      navigate('/')
+    } catch (err: any) {
+      setError(err.message || '注册失败，请重试')
+    }
   }
 
   return (
@@ -43,6 +49,12 @@ export function Register() {
 
         {/* 注册卡片 */}
         <div className="card-cute p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-cute text-danger text-sm">
+              ❌ {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground/70 mb-2">
