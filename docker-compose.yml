@@ -1,0 +1,172 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: o7m2-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: o7m2
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - o7m2-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: o7m2-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - o7m2-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: o7m2-api
+    command: ./bin/api
+    ports:
+      - "8080:8080"
+    environment:
+      - API_PORT=8080
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=o7m2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - o7m2-network
+    restart: unless-stopped
+
+  match:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: o7m2-match
+    command: ./bin/match
+    ports:
+      - "8081:8081"
+    environment:
+      - MATCH_PORT=8081
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=o7m2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - o7m2-network
+    restart: unless-stopped
+
+  miner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: o7m2-miner
+    command: ./bin/miner
+    ports:
+      - "8082:8082"
+    environment:
+      - MINER_PORT=8082
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=o7m2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - o7m2-network
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: o7m2-admin
+    command: ./bin/admin
+    ports:
+      - "8083:8083"
+    environment:
+      - ADMIN_PORT=8083
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=o7m2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - o7m2-network
+    restart: unless-stopped
+
+  trading-web:
+    build:
+      context: ./web/trading
+      dockerfile: Dockerfile
+    container_name: o7m2-trading
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - o7m2-network
+    restart: unless-stopped
+
+  admin-web:
+    build:
+      context: ./web/admin
+      dockerfile: Dockerfile
+    container_name: o7m2-admin-web
+    ports:
+      - "3001:3000"
+    depends_on:
+      - admin
+    networks:
+      - o7m2-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  o7m2-network:
+    driver: bridge
