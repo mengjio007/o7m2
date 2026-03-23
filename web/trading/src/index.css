@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,43 +11,149 @@
 }
 
 body {
-  background-color: #0d1117;
-  color: #c9d1d9;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #fef6fb 0%, #fff0f5 50%, #f0f8ff 100%);
+  color: #3d3d3d;
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  min-height: 100vh;
 }
 
+/* 可爱的滚动条 */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #161b22;
+  background: #fff0f5;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #30363d;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #ff6b9d, #ffa0c4);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #484f58;
+  background: linear-gradient(180deg, #e8457a, #ff6b9d);
 }
 
-@keyframes flash-green {
+/* 可爱的卡片样式 */
+.card-cute {
+  background: white;
+  border: 2px solid #f0b6d4;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(255, 107, 157, 0.15);
+  transition: all 0.3s ease;
+}
+
+.card-cute:hover {
+  box-shadow: 0 8px 30px rgba(255, 107, 157, 0.25);
+  transform: translateY(-2px);
+}
+
+/* 可爱的按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #ff6b9d 0%, #ffa0c4 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #e8457a 0%, #ff6b9d 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+}
+
+/* 分类标签 */
+.tag-virtual {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+  color: #e91e63;
+  border: 1px solid #f48fb1;
+}
+
+.tag-historical {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  color: #9c27b0;
+  border: 1px solid #ce93d8;
+}
+
+.tag-novel {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #2196f3;
+  border: 1px solid #90caf9;
+}
+
+/* 价格涨跌 */
+.price-up {
+  color: #ef5350;
+}
+
+.price-down {
+  color: #66bb6a;
+}
+
+/* 闪烁动画 */
+@keyframes flash-up {
   0%, 100% { background-color: transparent; }
-  50% { background-color: rgba(38, 166, 154, 0.3); }
+  50% { background-color: rgba(239, 83, 80, 0.2); }
 }
 
-@keyframes flash-red {
+@keyframes flash-down {
   0%, 100% { background-color: transparent; }
-  50% { background-color: rgba(239, 83, 80, 0.3); }
+  50% { background-color: rgba(102, 187, 106, 0.2); }
 }
 
-.flash-green {
-  animation: flash-green 0.5s ease-in-out;
+.flash-up {
+  animation: flash-up 0.5s ease-in-out;
 }
 
-.flash-red {
-  animation: flash-red 0.5s ease-in-out;
+.flash-down {
+  animation: flash-down 0.5s ease-in-out;
+}
+
+/* 浮动动画 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 输入框 */
+.input-cute {
+  background: white;
+  border: 2px solid #f0b6d4;
+  border-radius: 12px;
+  padding: 10px 16px;
+  transition: all 0.3s ease;
+}
+
+.input-cute:focus {
+  outline: none;
+  border-color: #ff6b9d;
+  box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.2);
+}
+
+/* 角色头像 */
+.avatar-cute {
+  border: 3px solid #f0b6d4;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(255, 107, 157, 0.2);
+}
+
+/* 装饰性元素 */
+.decoration-star {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #ffd54f, #ffb74d);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  opacity: 0.6;
 }

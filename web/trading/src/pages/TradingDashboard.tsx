@@ -11,7 +11,7 @@ import { EventModal } from '@/components/Event/EventModal'
 interface Character {
   id: string
   name: string
-  category: string
+  category: 'virtual' | 'historical' | 'novel'
   avatar: string
   current_price: number
   change_rate: number
@@ -23,98 +23,130 @@ interface Ticker {
   volume: number
 }
 
+const categoryLabels = {
+  virtual: { label: '虚拟人物', color: 'bg-cat-virtual/10 text-cat-virtual border-cat-virtual/30' },
+  historical: { label: '历史人物', color: 'bg-cat-historical/10 text-cat-historical border-cat-historical/30' },
+  novel: { label: '小说人物', color: 'bg-cat-novel/10 text-cat-novel border-cat-novel/30' },
+}
+
 export function TradingDashboard() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
   const [ticker, setTicker] = useState<Ticker | null>(null)
   const [showEvent, setShowEvent] = useState(false)
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground">
-      {/* Header */}
-      <header className="h-14 border-b border-border flex items-center px-4 justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-primary">偶气满满</h1>
-          <nav className="flex gap-4 text-sm">
-            <a href="/" className="text-primary">交易</a>
-            <a href="/mining" className="hover:text-primary">应援挖矿</a>
+    <div className="h-screen flex flex-col">
+      {/* 可爱的 Header */}
+      <header className="h-16 bg-white/80 backdrop-blur-sm border-b-2 border-primary/20 flex items-center px-6 justify-between">
+        <div className="flex items-center gap-6">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            ✨ 偶气满满
+          </h1>
+          <nav className="flex gap-2">
+            <a href="/" className="px-4 py-2 rounded-full bg-gradient-to-r from-primary to-primary-light text-white text-sm font-medium shadow-cute">
+              💹 交易
+            </a>
+            <a href="/mining" className="px-4 py-2 rounded-full text-foreground/70 hover:bg-primary/10 text-sm transition-all">
+              ⛏️ 应援挖矿
+            </a>
           </nav>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => setShowEvent(true)}
-            className="px-3 py-1 bg-warning/20 text-warning rounded text-sm"
+            className="px-4 py-2 bg-warning/10 text-warning rounded-full text-sm border border-warning/30 hover:bg-warning/20 transition-all"
           >
-            全站事件
+            🔔 全站事件
           </button>
-          <a href="/login" className="px-4 py-1.5 bg-primary text-background rounded text-sm font-medium">
-            登录
+          <a href="/login" className="btn-primary text-sm">
+            登录 ✌️
           </a>
         </div>
       </header>
 
-      {/* Main content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left: Character List */}
-        <aside className="w-64 border-r border-border">
+      {/* 主内容区 */}
+      <div className="flex-1 flex overflow-hidden p-4 gap-4">
+        {/* 左侧：角色列表 */}
+        <aside className="w-72 card-cute overflow-hidden flex flex-col">
           <CharacterList 
             onSelect={setSelectedCharacter}
             selectedId={selectedCharacter?.id}
           />
         </aside>
 
-        {/* Center: Chart + Trading Form */}
-        <main className="flex-1 flex flex-col">
-          {/* Price Header */}
-          {selectedCharacter && (
-            <div className="h-16 border-b border-border flex items-center px-4 gap-6">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold">{selectedCharacter.name}</span>
-                <span className="text-xs px-2 py-0.5 bg-card rounded">{selectedCharacter.category}</span>
-              </div>
+        {/* 中间：K线 + 交易表单 */}
+        <main className="flex-1 flex flex-col gap-4">
+          {/* 价格头部 */}
+          {selectedCharacter ? (
+            <div className="card-cute p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-light to-accent-light flex items-center justify-center text-2xl shadow-cute">
+                  🎭
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-foreground">{selectedCharacter.name}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full border ${categoryLabels[selectedCharacter.category].color}`}>
+                      {categoryLabels[selectedCharacter.category].label}
+                    </span>
+                  </div>
+                  <div className="text-sm text-foreground/60 mt-1">
+                    ID: {selectedCharacter.id}
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-primary">
                   {selectedCharacter.current_price.toLocaleString()}
-                </span>
-                <span className={`text-sm ${selectedCharacter.change_rate >= 0 ? 'text-success' : 'text-danger'}`}>
-                  {selectedCharacter.change_rate >= 0 ? '+' : ''}{selectedCharacter.change_rate.toFixed(2)}%
-                </span>
+                  <span className="text-sm text-foreground/50 ml-1">人气值</span>
+                </div>
+                <div className={`text-lg font-medium ${selectedCharacter.change_rate >= 0 ? 'text-up' : 'text-down'}`}>
+                  {selectedCharacter.change_rate >= 0 ? '📈 +' : '📉 '}{selectedCharacter.change_rate.toFixed(2)}%
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="card-cute p-8 flex items-center justify-center">
+              <div className="text-center text-foreground/50">
+                <div className="text-4xl mb-2">🎮</div>
+                <div>选择一个角色开始交易吧~</div>
               </div>
             </div>
           )}
 
-          {/* K-Line Chart */}
-          <div className="flex-1 min-h-0">
+          {/* K线图 */}
+          <div className="flex-1 min-h-0 card-cute overflow-hidden">
             <KLineChart characterId={selectedCharacter?.id} />
           </div>
 
-          {/* Trading Form */}
-          <div className="h-52 border-t border-border">
+          {/* 交易表单 */}
+          <div className="h-48 card-cute">
             <TradingForm character={selectedCharacter} ticker={ticker} />
           </div>
         </main>
 
-        {/* Right: OrderBook + Recent Trades */}
-        <aside className="w-72 border-l border-border flex flex-col">
-          <div className="flex-1 min-h-0">
+        {/* 右侧：订单簿 + 成交 */}
+        <aside className="w-80 flex flex-col gap-4">
+          <div className="flex-1 min-h-0 card-cute overflow-hidden">
             <OrderBook characterId={selectedCharacter?.id} />
           </div>
-          <div className="h-48 border-t border-border">
+          <div className="h-52 card-cute overflow-hidden">
             <RecentTrades characterId={selectedCharacter?.id} />
           </div>
         </aside>
       </div>
 
-      {/* Bottom: Positions + Orders */}
-      <footer className="h-48 border-t border-border flex">
-        <div className="flex-1 border-r border-border">
+      {/* 底部：持仓 + 委托 */}
+      <footer className="h-48 mx-4 mb-4 flex gap-4">
+        <div className="flex-1 card-cute overflow-hidden">
           <MyPositions />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 card-cute overflow-hidden">
           <MyOrders />
         </div>
       </footer>
 
-      {/* Event Modal */}
+      {/* 事件弹窗 */}
       {showEvent && (
         <EventModal onClose={() => setShowEvent(false)} />
       )}

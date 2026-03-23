@@ -27,7 +27,7 @@ CREATE TABLE users (
 CREATE TABLE characters (
     id VARCHAR(32) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    category ENUM('anime', 'star', 'political', 'science') NOT NULL,
+    category ENUM('virtual', 'historical', 'novel') NOT NULL COMMENT '分类: 虚拟人物/历史人物/小说人物',
     avatar VARCHAR(255) DEFAULT '',
     description TEXT,
     initial_price BIGINT NOT NULL DEFAULT 1000,
@@ -37,6 +37,28 @@ CREATE TABLE characters (
     INDEX idx_category (category),
     INDEX idx_status (status)
 ) ENGINE=InnoDB;
+
+-- 插入示例角色数据
+INSERT INTO characters (id, name, category, avatar, description, initial_price) VALUES
+-- 虚拟人物
+('char_v001', '初音未来', 'virtual', '/avatars/miku.png', '世界第一公主殿下', 1500),
+('char_v002', '洛天依', 'virtual', '/avatars/tianyi.png', '中国首位虚拟歌姬', 1200),
+('char_v003', '雷电将军', 'virtual', '/avatars/raiden.png', '原神-稻妻雷神', 2000),
+('char_v004', '甘雨', 'virtual', '/avatars/ganyu.png', '原神-璃月秘书', 1800),
+('char_v005', '琪亚娜', 'virtual', '/avatars/kiana.png', '崩坏3-空之律者', 1600),
+('char_v006', '嘉然', 'virtual', '/avatars/diana.png', 'A-SOUL-顶流虚拟偶像', 2500),
+-- 历史人物
+('char_h001', '李白', 'historical', '/avatars/libai.png', '诗仙-大唐剑客', 1800),
+('char_h002', '苏轼', 'historical', '/avatars/sushi.png', '东坡居士-美食家', 1500),
+('char_h003', '武则天', 'historical', '/avatars/wuzetian.png', '千古女帝', 2200),
+('char_h004', '诸葛亮', 'historical', '/avatars/kongming.png', '卧龙先生', 2000),
+('char_h005', '秦始皇', 'historical', '/avatars/qinshihuang.png', '千古一帝', 2500),
+-- 小说人物
+('char_n001', '林黛玉', 'novel', '/avatars/lindaiyu.png', '红楼梦-绛珠仙子', 1600),
+('char_n002', '孙悟空', 'novel', '/avatars/wukong.png', '西游记-齐天大圣', 2200),
+('char_n003', '诸葛亮', 'novel', '/avatars/kongming2.png', '三国演义-智绝', 2000),
+('char_n004', '武松', 'novel', '/avatars/wusong.png', '水浒传-行者', 1400),
+('char_n005', '贾宝玉', 'novel', '/avatars/jiabaoyu.png', '红楼梦-怡红公子', 1500);
 
 -- 账户表
 CREATE TABLE accounts (

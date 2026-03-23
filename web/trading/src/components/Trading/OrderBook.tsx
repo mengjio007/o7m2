@@ -33,62 +33,71 @@ export function OrderBook({ characterId }: Props) {
   let bidCumulative = 0
 
   return (
-    <div className="h-full flex flex-col text-xs">
-      <div className="p-2 border-b border-border font-semibold">
-        订单簿
+    <div className="h-full flex flex-col text-sm">
+      {/* 头部 */}
+      <div className="p-3 border-b border-primary/20 flex items-center gap-2">
+        <span className="text-lg">📊</span>
+        <span className="font-bold text-foreground">订单簿</span>
       </div>
 
-      {/* Header */}
-      <div className="grid grid-cols-3 px-2 py-1 text-foreground/50 border-b border-border">
-        <span>价格</span>
+      {/* 表头 */}
+      <div className="grid grid-cols-3 px-3 py-2 text-xs text-foreground/50 bg-primary/5">
+        <span>价格 (人气值)</span>
         <span className="text-right">数量</span>
         <span className="text-right">累计</span>
       </div>
 
-      {/* Asks (sell orders) */}
+      {/* 卖单（价格升序） */}
       <div className="flex-1 overflow-y-auto flex flex-col-reverse">
         {asks.slice().reverse().map((level, i) => {
           askCumulative += level.quantity
           return (
-            <div key={i} className="grid grid-cols-3 px-2 py-0.5 relative hover:bg-card">
+            <div key={i} className="grid grid-cols-3 px-3 py-1.5 relative hover:bg-up/5 transition-colors">
+              {/* 深度条背景 */}
               <div 
-                className="absolute inset-0 bg-danger/10"
+                className="absolute right-0 top-0 bottom-0 bg-up/10"
                 style={{ width: `${(level.quantity / maxQuantity) * 100}%` }}
               />
-              <span className="text-danger relative">{level.price}</span>
-              <span className="text-right relative">{level.quantity}</span>
+              <span className="text-up font-medium relative">{level.price.toLocaleString()}</span>
+              <span className="text-right relative text-foreground/70">{level.quantity}</span>
               <span className="text-right relative text-foreground/50">
-                {askCumulative}
+                {askCumulative.toLocaleString()}
               </span>
             </div>
           )
         })}
       </div>
 
-      {/* Last Price */}
-      <div className={`py-2 px-2 text-center font-bold text-lg border-y border-border ${
-        changeRate >= 0 ? 'text-success' : 'text-danger'
+      {/* 最新价 */}
+      <div className={`py-3 px-3 text-center border-y-2 border-primary/20 ${
+        changeRate >= 0 ? 'bg-up/5' : 'bg-down/5'
       }`}>
-        {lastPrice}
-        <span className="text-xs ml-2">
-          {changeRate >= 0 ? '↑' : '↓'} {Math.abs(changeRate).toFixed(2)}%
-        </span>
+        <div className={`text-2xl font-bold ${
+          changeRate >= 0 ? 'text-up' : 'text-down'
+        }`}>
+          {lastPrice.toLocaleString()}
+        </div>
+        <div className={`text-sm ${
+          changeRate >= 0 ? 'text-up' : 'text-down'
+        }`}>
+          {changeRate >= 0 ? '📈' : '📉'} {changeRate >= 0 ? '+' : ''}{changeRate.toFixed(2)}%
+        </div>
       </div>
 
-      {/* Bids (buy orders) */}
+      {/* 买单（价格降序） */}
       <div className="flex-1 overflow-y-auto">
         {bids.map((level, i) => {
           bidCumulative += level.quantity
           return (
-            <div key={i} className="grid grid-cols-3 px-2 py-0.5 relative hover:bg-card">
+            <div key={i} className="grid grid-cols-3 px-3 py-1.5 relative hover:bg-down/5 transition-colors">
               <div 
-                className="absolute inset-0 bg-success/10"
+                className="absolute right-0 top-0 bottom-0 bg-down/10"
                 style={{ width: `${(level.quantity / maxQuantity) * 100}%` }}
               />
-              <span className="text-success relative">{level.price}</span>
-              <span className="text-right relative">{level.quantity}</span>
+              <span className="text-down font-medium relative">{level.price.toLocaleString()}</span>
+              <span className="text-right relative text-foreground/70">{level.quantity}</span>
               <span className="text-right relative text-foreground/50">
-                {bidCumulative}
+                {bidCumulative.toLocaleString()}
               </span>
             </div>
           )

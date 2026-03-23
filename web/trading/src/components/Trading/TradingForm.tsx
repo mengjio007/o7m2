@@ -25,45 +25,49 @@ export function TradingForm({ character, ticker }: Props) {
 
   const handleSubmit = () => {
     if (!character) {
-      alert('请先选择角色')
+      alert('请先选择一个角色哦~')
       return
     }
     console.log('Submit order:', { side, price, quantity })
   }
 
   return (
-    <div className="h-full p-4">
-      <div className="flex gap-2 mb-4">
+    <div className="h-full p-4 flex gap-4">
+      {/* 买入/卖出切换 */}
+      <div className="flex flex-col gap-2">
         <button
           onClick={() => setSide('buy')}
-          className={`flex-1 py-2 rounded font-medium transition-colors ${
+          className={`px-6 py-3 rounded-cute font-medium transition-all ${
             side === 'buy'
-              ? 'bg-success text-white'
-              : 'bg-card text-foreground/50 hover:bg-card/80'
+              ? 'bg-gradient-to-r from-down to-down/80 text-white shadow-lg'
+              : 'bg-down/10 text-down hover:bg-down/20'
           }`}
         >
-          买入
+          💰 买入
         </button>
         <button
           onClick={() => setSide('sell')}
-          className={`flex-1 py-2 rounded font-medium transition-colors ${
+          className={`px-6 py-3 rounded-cute font-medium transition-all ${
             side === 'sell'
-              ? 'bg-danger text-white'
-              : 'bg-card text-foreground/50 hover:bg-card/80'
+              ? 'bg-gradient-to-r from-up to-up/80 text-white shadow-lg'
+              : 'bg-up/10 text-up hover:bg-up/20'
           }`}
         >
-          卖出
+          💸 卖出
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {/* Price Input */}
+      {/* 输入区域 */}
+      <div className="flex-1 grid grid-cols-2 gap-4">
+        {/* 价格输入 */}
         <div>
-          <label className="block text-xs text-foreground/50 mb-1">价格</label>
-          <div className="flex gap-1">
+          <label className="block text-sm text-foreground/60 mb-2">
+            💲 价格 (人气值)
+          </label>
+          <div className="flex gap-2">
             <button 
-              onClick={() => setPrice(String(Math.round(Number(price) * 0.99)))}
-              className="px-2 py-1 bg-card rounded text-xs hover:bg-card/80"
+              onClick={() => setPrice(String(Math.max(0, Math.round(Number(price) * 0.99))))}
+              className="px-3 py-2 bg-primary/10 text-primary rounded-cute text-sm hover:bg-primary/20 transition-all"
             >
               -1%
             </button>
@@ -72,21 +76,23 @@ export function TradingForm({ character, ticker }: Props) {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="输入价格"
-              className="flex-1 px-2 py-1 bg-background border border-border rounded text-sm focus:outline-none focus:border-primary"
+              className="input-cute flex-1 text-center"
             />
             <button 
               onClick={() => setPrice(String(Math.round(Number(price) * 1.01)))}
-              className="px-2 py-1 bg-card rounded text-xs hover:bg-card/80"
+              className="px-3 py-2 bg-primary/10 text-primary rounded-cute text-sm hover:bg-primary/20 transition-all"
             >
               +1%
             </button>
           </div>
         </div>
 
-        {/* Quantity Input */}
+        {/* 数量输入 */}
         <div>
-          <label className="block text-xs text-foreground/50 mb-1">数量</label>
-          <div className="flex gap-1 mb-1">
+          <label className="block text-sm text-foreground/60 mb-2">
+            📦 数量 (份额)
+          </label>
+          <div className="flex gap-2 mb-2">
             {[25, 50, 75, 100].map((pct) => (
               <button
                 key={pct}
@@ -94,7 +100,11 @@ export function TradingForm({ character, ticker }: Props) {
                   const maxQty = price ? Math.floor(balance / Number(price)) : 0
                   setQuantity(String(Math.floor(maxQty * pct / 100)))
                 }}
-                className="flex-1 py-1 bg-card rounded text-xs hover:bg-card/80"
+                className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
+                  pct === 100 
+                    ? 'bg-accent/10 text-accent hover:bg-accent/20' 
+                    : 'bg-primary/5 text-foreground/60 hover:bg-primary/10'
+                }`}
               >
                 {pct}%
               </button>
@@ -105,35 +115,39 @@ export function TradingForm({ character, ticker }: Props) {
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="输入数量"
-            className="w-full px-2 py-1 bg-background border border-border rounded text-sm focus:outline-none focus:border-primary"
+            className="input-cute w-full text-center"
           />
         </div>
       </div>
 
-      {/* Summary */}
-      <div className="mt-4 p-3 bg-card rounded">
-        <div className="flex justify-between text-sm">
-          <span className="text-foreground/50">合计</span>
-          <span className="font-bold">{totalAmount.toLocaleString()} 人气值</span>
+      {/* 合计和提交 */}
+      <div className="w-48 flex flex-col justify-between">
+        {/* 合计 */}
+        <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-cute p-4">
+          <div className="text-xs text-foreground/50 mb-1">💰 合计</div>
+          <div className="text-xl font-bold text-primary">
+            {totalAmount.toLocaleString()}
+            <span className="text-xs text-foreground/50 ml-1">人气值</span>
+          </div>
+          <div className="text-xs text-foreground/50 mt-2">
+            可用: {balance.toLocaleString()} 人气值
+          </div>
         </div>
-        <div className="flex justify-between text-xs text-foreground/50 mt-1">
-          <span>可用余额</span>
-          <span>{balance.toLocaleString()} 人气值</span>
-        </div>
-      </div>
 
-      {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={!character}
-        className={`w-full mt-4 py-2 rounded font-medium ${
-          side === 'buy'
-            ? 'bg-success hover:bg-success/90'
-            : 'bg-danger hover:bg-danger/90'
-        } text-white disabled:opacity-50`}
-      >
-        {side === 'buy' ? '买入' : '卖出'} {character?.name || ''}
-      </button>
+        {/* 提交按钮 */}
+        <button
+          onClick={handleSubmit}
+          disabled={!character}
+          className={`w-full py-3 rounded-cute font-bold text-white transition-all ${
+            side === 'buy'
+              ? 'bg-gradient-to-r from-down to-down/80 hover:shadow-lg hover:scale-105'
+              : 'bg-gradient-to-r from-up to-up/80 hover:shadow-lg hover:scale-105'
+          } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+        >
+          {side === 'buy' ? '🚀 立即买入' : '💸 立即卖出'}
+          {character && ` ${character.name}`}
+        </button>
+      </div>
     </div>
   )
 }

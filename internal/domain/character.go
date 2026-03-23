@@ -5,10 +5,9 @@ import "time"
 type Category string
 
 const (
-	CategoryAnime     Category = "anime"
-	CategoryStar      Category = "star"
-	CategoryPolitical Category = "political"
-	CategoryScience   Category = "science"
+	CategoryVirtual    Category = "virtual"    // 虚拟人物（二次元、游戏角色等）
+	CategoryHistorical Category = "historical" // 历史人物
+	CategoryNovel      Category = "novel"      // 小说人物
 )
 
 type CharacterStatus string

@@ -1,16 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { createChart, IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-charts'
 
 interface Props {
   characterId?: string
-}
-
-interface KLineData {
-  time: Time
-  open: number
-  high: number
-  low: number
-  close: number
 }
 
 interface VolumeData {
@@ -29,23 +21,25 @@ export function KLineChart({ characterId }: Props) {
   const generateDemoData = () => {
     const candles: CandlestickData[] = []
     const volumes: VolumeData[] = []
-    let basePrice = 1200
+    let basePrice = 1500
     const now = Math.floor(Date.now() / 1000)
 
     for (let i = 100; i >= 0; i--) {
       const time = (now - i * 3600) as Time
       const open = basePrice
-      const change = (Math.random() - 0.5) * 100
+      const change = (Math.random() - 0.5) * 80
       const close = open + change
-      const high = Math.max(open, close) + Math.random() * 30
-      const low = Math.min(open, close) - Math.random() * 30
+      const high = Math.max(open, close) + Math.random() * 20
+      const low = Math.min(open, close) - Math.random() * 20
       const volume = Math.floor(Math.random() * 1000) + 100
+      const isUp = close >= open
 
       candles.push({ time, open, high, low, close })
       volumes.push({
         time,
         value: volume,
-        color: close >= open ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)',
+        // 欧易风格：涨粉色，跌绿色
+        color: isUp ? 'rgba(255, 107, 157, 0.4)' : 'rgba(102, 187, 106, 0.4)',
       })
 
       basePrice = close
@@ -57,36 +51,50 @@ export function KLineChart({ characterId }: Props) {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
+    // 欧易风格：白底
     const chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight,
       layout: {
-        background: { color: '#161b22' },
-        textColor: '#c9d1d9',
+        background: { color: '#ffffff' },
+        textColor: '#666666',
       },
       grid: {
-        vertLines: { color: '#30363d' },
-        horzLines: { color: '#30363d' },
+        vertLines: { color: '#f0f0f0' },
+        horzLines: { color: '#f0f0f0' },
       },
       crosshair: {
         mode: 0,
+        vertLine: {
+          color: '#ff6b9d',
+          width: 1,
+          style: 2,
+          labelBackgroundColor: '#ff6b9d',
+        },
+        horzLine: {
+          color: '#ff6b9d',
+          width: 1,
+          style: 2,
+          labelBackgroundColor: '#ff6b9d',
+        },
       },
       rightPriceScale: {
-        borderColor: '#30363d',
+        borderColor: '#f0f0f0',
       },
       timeScale: {
-        borderColor: '#30363d',
+        borderColor: '#f0f0f0',
         timeVisible: true,
       },
     })
 
-    // Candlestick series
+    // Candlestick series - 欧易风格：涨粉色，跌绿色
     const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#26a69a',
-      downColor: '#ef5350',
-      borderVisible: false,
-      wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350',
+      upColor: '#ff6b9d',        // 涨 - 粉色
+      downColor: '#66bb6a',      // 跌 - 绿色
+      borderUpColor: '#ff6b9d',
+      borderDownColor: '#66bb6a',
+      wickUpColor: '#ff6b9d',
+      wickDownColor: '#66bb6a',
     })
 
     // Volume series
