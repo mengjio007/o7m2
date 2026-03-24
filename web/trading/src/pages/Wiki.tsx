@@ -14,15 +14,9 @@ interface Character {
   day_high: number
   day_low: number
   volume: number
-  rank?: {
-    rank: string
-    label: string
-    icon: string
-    color: string
-  }
+  rank?: { rank: string; label: string; icon: string; color: string }
 }
 
-// 模拟更多角色信息
 const getCharacterDetails = (char: Character) => {
   const details: Record<string, any> = {
     'v001': {
@@ -33,14 +27,10 @@ const getCharacterDetails = (char: Character) => {
       weight: '42kg',
       cv: '藤田咲 (声源)',
       company: 'CRYPTON FUTURE MEDIA',
-      moe: ['虚拟歌姬', '葱绿色双马尾', '未来感', '元气', '世界第一公主殿下'],
+      moe: ['虚拟歌姬', '葱绿色双马尾', '未来感', '元气'],
       quote: '初次见面，我是初音未来！请多关照！',
-      works: ['メルト', '千本桜', 'ロミオとシンデレラ', 'ストロボナイツ'],
-      relations: [
-        { name: '镜音铃', relation: '同社角色' },
-        { name: '镜音连', relation: '同社角色' },
-        { name: '巡音流歌', relation: '同社角色' },
-      ]
+      works: ['メルト', '千本桜', 'ロミオとシンデレラ'],
+      relations: [{ name: '镜音铃', relation: '同社角色' }, { name: '巡音流歌', relation: '同社角色' }]
     },
     'v002': {
       fullname: '洛天依 (Luo Tianyi)',
@@ -50,14 +40,10 @@ const getCharacterDetails = (char: Character) => {
       weight: '41kg',
       cv: '山新 (声源)',
       company: '上海禾念信息科技有限公司',
-      moe: ['虚拟歌姬', '灰发绿瞳', '呆萌', '吃货', '中华风'],
+      moe: ['虚拟歌姬', '灰发绿瞳', '呆萌', '吃货'],
       quote: '大家好！我是洛天依！',
-      works: ['权御天下', '达拉崩吧', '芒种', '勾指起誓'],
-      relations: [
-        { name: '言和', relation: '同社角色' },
-        { name: '乐正绫', relation: '同社角色' },
-        { name: '乐正龙牙', relation: '同社角色' },
-      ]
+      works: ['权御天下', '达拉崩吧', '芒种'],
+      relations: [{ name: '言和', relation: '同社角色' }, { name: '乐正绫', relation: '同社角色' }]
     },
     'v003': {
       fullname: '雷电将軍 (Raiden Shogun)',
@@ -66,15 +52,11 @@ const getCharacterDetails = (char: Character) => {
       height: '170cm',
       weight: '???',
       cv: '泽城美雪',
-      company: 'miHoYo (现HoYoverse)',
-      moe: ['紫发', '雷元素', '永恒', '高冷', '反差萌'],
+      company: 'miHoYo',
+      moe: ['紫发', '雷元素', '永恒', '高冷'],
       quote: '此世须臾，我即永恒。',
       works: ['原神'],
-      relations: [
-        { name: '八重神子', relation: '挚友' },
-        { name: '神里绫人', relation: '下属' },
-        { name: '九条裟罗', relation: '狂热追随者' },
-      ]
+      relations: [{ name: '八重神子', relation: '挚友' }, { name: '九条裟罗', relation: '追随者' }]
     }
   }
   return details[char.id] || {
@@ -92,7 +74,6 @@ const getCharacterDetails = (char: Character) => {
   }
 }
 
-// K线数据生成
 const generateKLineData = () => {
   const data = []
   let price = 1500
@@ -125,16 +106,9 @@ export function Wiki() {
       setLoading(false)
     }).catch(() => {
       setCharacter({
-        id: charId,
-        name: '初音未来',
-        category: 'virtual',
-        avatar: '🎤',
-        description: '初音未来是CRYPTON FUTURE MEDIA以Yamaha的VOCALOID系列语音合成程序为基础开发的音源库，音源数据资料采样于日本声优藤田咲。',
-        initial_price: 1500,
-        current_price: 1587.23,
-        day_high: 1650,
-        day_low: 1480,
-        volume: 25000,
+        id: charId, name: '初音未来', category: 'virtual', avatar: '🎤',
+        description: '初音未来是CRYPTON FUTURE MEDIA以Yamaha的VOCALOID系列语音合成程序为基础开发的音源库。',
+        initial_price: 1500, current_price: 1587.23, day_high: 1650, day_low: 1480, volume: 25000,
       })
       setLoading(false)
     })
@@ -156,7 +130,6 @@ export function Wiki() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-      {/* Header */}
       <header className="h-12 md:h-14 bg-white shadow-sm border-b-2 border-pink-300 flex items-center px-3 md:px-6 justify-between">
         <Link to="/" className="text-base md:text-xl font-bold text-pink-500 flex items-center gap-1 md:gap-2">
           <span className="text-xl md:text-2xl">✨</span>
@@ -172,7 +145,6 @@ export function Wiki() {
         </div>
       </header>
 
-      {/* 角色选择条 */}
       <div className="bg-white/80 border-b px-3 md:px-6 py-2 flex gap-2 overflow-x-auto">
         {allCharacters.map((c) => (
           <Link key={c.id} to={`/wiki?id=${c.id}`} className={`flex-shrink-0 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm ${c.id === charId ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-600'}`}>
@@ -183,12 +155,10 @@ export function Wiki() {
 
       {character && details && (
         <div className="container mx-auto px-3 md:px-6 py-4 md:py-6">
-          {/* 欢迎提示 - 移动端隐藏 */}
           <div className="hidden md:block bg-pink-50 border border-pink-200 rounded-lg px-4 py-2 mb-4 md:mb-6 text-sm text-pink-600">
             ✨ 萌娘百科欢迎您参与完善本条目☆Kira~
           </div>
 
-          {/* 标题 */}
           <h1 className="text-xl md:text-3xl font-bold text-gray-800 mb-3 md:mb-4 flex items-center gap-2 md:gap-3">
             <span>{character.name}</span>
             {character.rank && (
@@ -203,16 +173,13 @@ export function Wiki() {
             )}
           </h1>
 
-          {/* 引用 */}
           {details.quote && (
             <div className="bg-gray-50 border-l-4 border-pink-400 pl-3 md:pl-4 py-2 mb-4 md:mb-6 italic text-gray-600 text-sm md:text-base">
               " {details.quote} "
             </div>
           )}
 
-          {/* 移动端: 图片在上,信息在下 */}
           <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-            {/* 角色图片 */}
             <div className="w-full md:w-72 flex-shrink-0">
               <div className="bg-white rounded-lg shadow-md overflow-hidden border border-pink-200">
                 <div className="aspect-square bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
@@ -224,7 +191,6 @@ export function Wiki() {
                 </div>
               </div>
 
-              {/* 交易信息卡片 */}
               <div className="bg-white rounded-lg shadow-md mt-4 p-3 md:p-4 border border-pink-200">
                 <h3 className="font-bold text-pink-600 mb-2 md:mb-3 text-sm md:text-base">📈 交易信息</h3>
                 <div className="grid grid-cols-2 md:grid-cols-1 gap-2 text-xs md:text-sm">
@@ -237,9 +203,7 @@ export function Wiki() {
               </div>
             </div>
 
-            {/* 详细信息 */}
             <div className="flex-1">
-              {/* 基本资料表格 */}
               <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden mb-4 md:mb-6">
                 <div className="bg-pink-500 text-white px-3 md:px-4 py-2 font-bold text-sm md:text-base">📋 基本资料</div>
                 <table className="w-full text-xs md:text-sm">
@@ -254,13 +218,11 @@ export function Wiki() {
                 </table>
               </div>
 
-              {/* 简介 */}
               <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden mb-4 md:mb-6">
                 <div className="bg-pink-500 text-white px-3 md:px-4 py-2 font-bold text-sm md:text-base">📝 简介</div>
                 <div className="p-3 md:p-4 text-gray-700 text-sm md:text-base leading-relaxed">{character.description || '暂无...'}</div>
               </div>
 
-              {/* 代表作品 */}
               {details.works.length > 0 && (
                 <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden mb-4 md:mb-6">
                   <div className="bg-pink-500 text-white px-3 md:px-4 py-2 font-bold text-sm md:text-base">🎵 代表作品</div>
@@ -268,7 +230,6 @@ export function Wiki() {
                 </div>
               )}
 
-              {/* 人际关系 */}
               {details.relations.length > 0 && (
                 <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden">
                   <div className="bg-pink-500 text-white px-3 md:px-4 py-2 font-bold text-sm md:text-base">👥 人际关系</div>
@@ -282,186 +243,6 @@ export function Wiki() {
 
       <footer className="mt-8 py-4 md:py-6 bg-white border-t text-center text-gray-400 text-xs md:text-sm">
         © 2026 偶气百科 - 二次元人气交易所
-      </footer>
-    </div>
-  )
-}
-                  ) : (
-                    <span className="text-8xl">{character.avatar || '🎭'}</span>
-                  )}
-                </div>
-              </div>
-              
-              {/* 交易信息卡片 */}
-              <div className="bg-white rounded-lg shadow-md mt-4 p-4 border border-pink-200">
-                <h3 className="font-bold text-pink-600 mb-3 flex items-center gap-2">
-                  <span>📈</span> 交易信息
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">当前价格</span>
-                    <span className="font-bold text-pink-600">{character.current_price?.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">发行价格</span>
-                    <span>{character.initial_price}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">今日最高</span>
-                    <span className="text-red-500">{character.day_high || '---'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">今日最低</span>
-                    <span className="text-green-500">{character.day_low || '---'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">成交量</span>
-                    <span>{character.volume?.toLocaleString() || 0}</span>
-                  </div>
-                </div>
-                <Link to="/" className="block mt-4 text-center py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
-                  📈 前往交易
-                </Link>
-              </div>
-
-              {/* K线迷你图 */}
-              <div className="bg-white rounded-lg shadow-md mt-4 p-4 border border-pink-200">
-                <h3 className="font-bold text-pink-600 mb-3 flex items-center gap-2">
-                  <span>📊</span> 近期走势
-                </h3>
-                <svg viewBox="0 0 200 100" className="w-full h-24">
-                  {kLineData.slice(-20).map((d, i) => {
-                    const x = (i / 20) * 190 + 5
-                    const isUp = d.close >= d.open
-                    const color = isUp ? '#ef4444' : '#22c55e'
-                    return (
-                      <g key={i}>
-                        <line
-                          x1={x} y1={90 - ((d.high - kMinPrice) / kPriceRange) * 80}
-                          x2={x} y2={90 - ((d.low - kMinPrice) / kPriceRange) * 80}
-                          stroke={color} strokeWidth="1"
-                        />
-                        <rect
-                          x={x - 3}
-                          y={90 - ((Math.max(d.open, d.close) - kMinPrice) / kPriceRange) * 80}
-                          width="6"
-                          height={Math.abs(d.close - d.open) / kPriceRange * 80 || 1}
-                          fill={color}
-                        />
-                      </g>
-                    )
-                  })}
-                </svg>
-              </div>
-            </div>
-
-            {/* 右侧：详细信息表格 */}
-            <div className="flex-1">
-              {/* 基本资料表格 */}
-              <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden mb-6">
-                <div className="bg-pink-500 text-white px-4 py-2 font-bold">
-                  📋 基本资料
-                </div>
-                <table className="w-full text-sm">
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700 w-28">本名</td>
-                      <td className="px-4 py-2">{details.fullname}</td>
-                    </tr>
-                    <tr className="border-b bg-gray-50">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700">别号</td>
-                      <td className="px-4 py-2">{details.nickname}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700">生日</td>
-                      <td className="px-4 py-2">{details.birth}</td>
-                    </tr>
-                    <tr className="border-b bg-gray-50">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700">身高</td>
-                      <td className="px-4 py-2">{details.height}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700">体重</td>
-                      <td className="px-4 py-2">{details.weight}</td>
-                    </tr>
-                    <tr className="border-b bg-gray-50">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700">声优/CV</td>
-                      <td className="px-4 py-2">{details.cv}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700">出品方</td>
-                      <td className="px-4 py-2">{details.company}</td>
-                    </tr>
-                    <tr className="bg-gray-50">
-                      <td className="bg-pink-50 px-4 py-2 font-medium text-gray-700">萌点</td>
-                      <td className="px-4 py-2">
-                        <div className="flex flex-wrap gap-1">
-                          {details.moe.map((m: string, i: number) => (
-                            <span key={i} className="px-2 py-0.5 bg-pink-100 text-pink-600 rounded text-xs">
-                              {m}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* 简介 */}
-              <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden mb-6">
-                <div className="bg-pink-500 text-white px-4 py-2 font-bold">
-                  📝 简介
-                </div>
-                <div className="p-4 text-gray-700 leading-relaxed">
-                  {character.description || '暂无详细介绍...'}
-                </div>
-              </div>
-
-              {/* 代表作品 */}
-              {details.works.length > 0 && (
-                <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden mb-6">
-                  <div className="bg-pink-500 text-white px-4 py-2 font-bold">
-                    🎵 代表作品
-                  </div>
-                  <div className="p-4">
-                    <ul className="list-disc list-inside text-gray-700 space-y-1">
-                      {details.works.map((w: string, i: number) => (
-                        <li key={i}>{w}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              {/* 人际关系 */}
-              {details.relations.length > 0 && (
-                <div className="bg-white rounded-lg shadow-md border border-pink-200 overflow-hidden mb-6">
-                  <div className="bg-pink-500 text-white px-4 py-2 font-bold">
-                    👥 人际关系
-                  </div>
-                  <div className="p-4">
-                    <div className="space-y-2">
-                      {details.relations.map((r: any, i: number) => (
-                        <div key={i} className="flex items-center gap-2 text-sm">
-                          <span className="text-pink-500">•</span>
-                          <span className="font-medium">{r.name}</span>
-                          <span className="text-gray-400">-</span>
-                          <span className="text-gray-500">{r.relation}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Footer */}
-      <footer className="mt-8 py-6 bg-white border-t text-center text-gray-400 text-sm">
-        <p>© 2026 偶气百科 - 二次元人气交易所 | 万物皆可萌的百科全书</p>
       </footer>
     </div>
   )

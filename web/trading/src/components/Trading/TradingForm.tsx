@@ -64,7 +64,7 @@ export function TradingForm({ character, ticker }: Props) {
         price: Number(price),
         quantity: Number(quantity),
       })
-      alert(side === '买入' ? '买入下单成功!' : '卖出下单成功!')
+      alert(side === 'buy' ? '买入下单成功!' : '卖出下单成功!')
       setQuantity('')
     } catch (error: any) {
       alert(error.message || '下单失败')

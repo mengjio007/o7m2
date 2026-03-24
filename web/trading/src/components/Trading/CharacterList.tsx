@@ -17,6 +17,10 @@ interface Character {
   avatar: string
   current_price: number
   day_open: number
+  day_high: number
+  day_low: number
+  volume: number
+  change_rate: number
   rank?: RankInfo
 }
 
