@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuthStore } from '@/store/auth'
+import { tradingApi, accountApi } from '@/services/api'
 
 interface Character {
   id: string
@@ -16,19 +18,59 @@ interface Props {
 }
 
 export function TradingForm({ character, ticker }: Props) {
+  const { isAuthenticated } = useAuthStore()
   const [side, setSide] = useState<'buy' | 'sell'>('buy')
   const [price, setPrice] = useState('')
   const [quantity, setQuantity] = useState('')
-  const [balance] = useState(10000)
+  const [balance, setBalance] = useState(0)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      accountApi.getAccount().then((res: any) => {
+        setBalance(res.account?.balance || 0)
+      }).catch(console.error)
+    }
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    if (character?.current_price) {
+      setPrice(String(character.current_price))
+    }
+  }, [character])
 
   const totalAmount = Number(price) * Number(quantity) || 0
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!character) {
       alert('请先选择一个角色哦~')
       return
     }
-    console.log('Submit order:', { side, price, quantity })
+    if (!price || !quantity) {
+      alert('请输入价格和数量')
+      return
+    }
+    if (!isAuthenticated) {
+      alert('请先登录')
+      return
+    }
+
+    setLoading(true)
+    try {
+      await tradingApi.createOrder({
+        character_id: character.id,
+        side,
+        type: 'limit',
+        price: Number(price),
+        quantity: Number(quantity),
+      })
+      alert(side === '买入' ? '买入下单成功!' : '卖出下单成功!')
+      setQuantity('')
+    } catch (error: any) {
+      alert(error.message || '下单失败')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -137,14 +179,14 @@ export function TradingForm({ character, ticker }: Props) {
         {/* 提交按钮 */}
         <button
           onClick={handleSubmit}
-          disabled={!character}
+          disabled={!character || loading}
           className={`w-full py-3 rounded-cute font-bold text-white transition-all ${
             side === 'buy'
               ? 'bg-gradient-to-r from-down to-down/80 hover:shadow-lg hover:scale-105'
               : 'bg-gradient-to-r from-up to-up/80 hover:shadow-lg hover:scale-105'
           } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
         >
-          {side === 'buy' ? '🚀 立即买入' : '💸 立即卖出'}
+          {loading ? '处理中...' : side === 'buy' ? '🚀 立即买入' : '💸 立即卖出'}
           {character && ` ${character.name}`}
         </button>
       </div>

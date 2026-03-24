@@ -246,7 +246,11 @@ INSERT INTO system_config (config_key, config_value, value_type, description) VA
 ('mining_max_difficulty', '8', 'int', '最大挖矿难度'),
 ('holding_bonus_100', '0.10', 'float', '持仓100加成率'),
 ('holding_bonus_500', '0.25', 'float', '持仓500加成率'),
-('holding_bonus_1000', '0.50', 'float', '持仓1000加成率');
+('holding_bonus_1000', '0.50', 'float', '持仓1000加成率'),
+('rank_la', '1000', 'int', '拉-最大价值'),
+('rank_npc', '5000', 'int', 'NPC-最大价值'),
+('rank_ren', '15000', 'int', '人上人-最大价值'),
+('rank_ding', '50000', 'int', '顶级-最大价值');
 
 -- 创建默认管理员账号（密码需要在运行时通过bcrypt生成）
 -- INSERT INTO users (id, username, email, password_hash, role) VALUES

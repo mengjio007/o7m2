@@ -166,23 +166,35 @@ export function Mining() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="h-16 bg-white/80 backdrop-blur-sm border-b-2 border-primary/20 flex items-center px-6 justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900">
+      {/* Header - 挖矿风格 */}
+      <header className="h-16 bg-gradient-to-r from-amber-600 to-orange-700 flex items-center px-6 justify-between">
         <div className="flex items-center gap-6">
-          <a href="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            ✨ 偶气满满
+          <a href="/" className="text-2xl font-bold text-white">
+            ⛏️ 偶气满满
           </a>
           <nav className="flex gap-2">
-            <a href="/" className="px-4 py-2 rounded-full text-foreground/70 hover:bg-primary/10 text-sm transition-all">
+            <a href="/" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm transition-all">
               💹 交易
             </a>
-            <a href="/mining" className="px-4 py-2 rounded-full bg-gradient-to-r from-primary to-primary-light text-white text-sm font-medium shadow-cute">
-              ⛏️ 应援挖矿
+            <a href="/mining" className="px-4 py-2 rounded-full bg-white/20 text-white text-sm font-medium">
+              挖矿
+            </a>
+            <a href="/wiki" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm transition-all">
+              📖 百科
+            </a>
+            <a href="/profile" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm transition-all">
+              👤 我的
             </a>
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-foreground/60">👋 {user?.username}</span>
+          <a href="/profile" className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full hover:bg-white/20">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center text-lg">
+              {user?.avatar || '🎭'}
+            </div>
+            <span className="text-white text-sm">{user?.username}</span>
+          </a>
         </div>
       </header>
 

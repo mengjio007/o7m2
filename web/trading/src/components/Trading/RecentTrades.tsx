@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react'
+import { characterApi } from '@/services/api'
+
 interface Trade {
   price: number
   quantity: number
-  time: string
-  isBuy: boolean
+  created_at: string
 }
 
 interface Props {
@@ -10,43 +12,61 @@ interface Props {
 }
 
 export function RecentTrades({ characterId }: Props) {
-  // Demo data
-  const trades: Trade[] = [
-    { price: 1500, quantity: 50, time: '12:34:56', isBuy: true },
-    { price: 1499, quantity: 30, time: '12:34:55', isBuy: false },
-    { price: 1500, quantity: 80, time: '12:34:54', isBuy: true },
-    { price: 1501, quantity: 25, time: '12:34:53', isBuy: true },
-    { price: 1500, quantity: 45, time: '12:34:52', isBuy: false },
-    { price: 1499, quantity: 60, time: '12:34:51', isBuy: false },
-    { price: 1500, quantity: 35, time: '12:34:50', isBuy: true },
-  ]
+  const [trades, setTrades] = useState<Trade[]>([])
+
+  useEffect(() => {
+    if (!characterId) return
+    loadTrades()
+    const interval = setInterval(loadTrades, 5000)
+    return () => clearInterval(interval)
+  }, [characterId])
+
+  const loadTrades = async () => {
+    if (!characterId) return
+    try {
+      const res: any = await characterApi.getTrades(characterId, 20)
+      setTrades(res.trades || [])
+    } catch (error) {
+      console.error('Failed to load trades:', error)
+    }
+  }
+
+  const formatTime = (dateStr: string) => {
+    if (!dateStr) return '--:--'
+    const d = new Date(dateStr)
+    return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  }
 
   return (
-    <div className="h-full flex flex-col text-sm">
-      {/* 头部 */}
-      <div className="p-3 border-b border-primary/20 flex items-center gap-2">
+    <div className="h-full flex flex-col text-sm text-white">
+      {/* Header */}
+      <div className="p-3 border-b border-white/10 flex items-center gap-2">
         <span className="text-lg">📜</span>
-        <span className="font-bold text-foreground">最近成交</span>
+        <span className="font-bold">最近成交</span>
       </div>
 
-      {/* 表头 */}
-      <div className="grid grid-cols-3 px-3 py-2 text-xs text-foreground/50 bg-primary/5">
-        <span>价格 (人气值)</span>
+      {/* Table header */}
+      <div className="grid grid-cols-3 px-3 py-2 text-xs text-white/50">
+        <span>价格</span>
         <span className="text-right">数量</span>
         <span className="text-right">时间</span>
       </div>
 
-      {/* 成交列表 */}
+      {/* Trades list */}
       <div className="flex-1 overflow-y-auto">
-        {trades.map((trade, i) => (
-          <div key={i} className="grid grid-cols-3 px-3 py-1.5 hover:bg-primary/5 transition-colors">
-            <span className={`font-medium ${trade.isBuy ? 'text-down' : 'text-up'}`}>
-              {trade.isBuy ? '↓' : '↑'} {trade.price.toLocaleString()}
-            </span>
-            <span className="text-right text-foreground/70">{trade.quantity}</span>
-            <span className="text-right text-foreground/50">{trade.time}</span>
-          </div>
-        ))}
+        {trades.length === 0 ? (
+          <div className="text-center text-white/30 py-8">暂无成交</div>
+        ) : (
+          trades.map((trade, i) => (
+            <div key={i} className="grid grid-cols-3 px-3 py-1 hover:bg-white/5">
+              <span className="text-white/70 font-mono">
+                {trade.price?.toLocaleString() || '---'}
+              </span>
+              <span className="text-right text-white/50">{trade.quantity}</span>
+              <span className="text-right text-white/50">{formatTime(trade.created_at)}</span>
+            </div>
+          ))
+        )}
       </div>
     </div>
   )

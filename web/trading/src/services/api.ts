@@ -61,6 +61,15 @@ export const characterApi = {
   
   get: (id: string) =>
     api.get(`/characters/${id}`),
+
+  getOrderBook: (id: string) =>
+    api.get(`/characters/${id}/orderbook`),
+
+  getTrades: (id: string, limit?: number) =>
+    api.get(`/characters/${id}/trades`, { params: { limit } }),
+
+  getKLines: (id: string, period?: string, limit?: number) =>
+    api.get(`/characters/${id}/klines`, { params: { period, limit } }),
 }
 
 // Account API
@@ -85,6 +94,24 @@ export const miningApi = {
   
   getStats: () =>
     api.get('/mining/stats'),
+}
+
+// Trading API
+export const tradingApi = {
+  createOrder: (data: {
+    client_order_id?: string
+    character_id: string
+    side: 'buy' | 'sell'
+    type: 'limit' | 'market'
+    price: number
+    quantity: number
+  }) => api.post('/orders', data),
+  
+  getOrders: () => api.get('/orders'),
+  
+  cancelOrder: (orderId: string) => api.delete(`/orders/${orderId}`),
+  
+  getPositions: () => api.get('/positions'),
 }
 
 export default api

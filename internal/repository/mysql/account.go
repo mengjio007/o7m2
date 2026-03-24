@@ -2,7 +2,9 @@ package mysql
 
 import (
 	"database/sql"
+	"time"
 
+	"github.com/google/uuid"
 	"o7m2/internal/domain"
 )
 
@@ -105,4 +107,30 @@ func (r *AccountRepository) CreateLedger(ledger *domain.Ledger) error {
 	_, err := r.db.Exec(query, ledger.ID, ledger.UserID, ledger.Type,
 		ledger.Amount, ledger.Balance, ledger.RefID, ledger.Remark, ledger.CreatedAt)
 	return err
+}
+
+func (r *AccountRepository) AddHolding(userID, characterID string, quantity int64, price int64) error {
+	h, err := r.GetHolding(userID, characterID)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+	if h.Quantity == 0 {
+		h.ID = uuid.New().String()[:8]
+		h.UserID = userID
+		h.CharacterID = characterID
+		h.Quantity = quantity
+		h.AvgCost = price
+		h.CreatedAt = now
+		h.UpdatedAt = now
+		return r.UpsertHolding(h)
+	}
+
+	newQty := h.Quantity + quantity
+	newAvgCost := (h.AvgCost*h.Quantity + price*quantity) / newQty
+	h.Quantity = newQty
+	h.AvgCost = newAvgCost
+	h.UpdatedAt = now
+	return r.UpsertHolding(h)
 }

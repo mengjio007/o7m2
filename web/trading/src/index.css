@@ -157,3 +157,88 @@ body {
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   opacity: 0.6;
 }
+
+/* ===== 咖位头像框动画 ===== */
+
+/* 夯 - 燃烧火焰效果 */
+@keyframes hang-fire {
+  0%, 100% { 
+    box-shadow: 0 0 10px #ff6b00, 0 0 20px #ff4500, 0 0 30px #ff0000;
+    transform: scale(1);
+  }
+  25% { 
+    box-shadow: 0 0 15px #ff8c00, 0 0 25px #ff6347, 0 0 35px #ff4500;
+    transform: scale(1.02);
+  }
+  50% { 
+    box-shadow: 0 0 20px #ffa500, 0 0 30px #ff6b00, 0 0 40px #ff4500;
+    transform: scale(1.05);
+  }
+  75% { 
+    box-shadow: 0 0 15px #ff8c00, 0 0 25px #ff6347, 0 0 35px #ff4500;
+    transform: scale(1.02);
+  }
+}
+
+.animate-hang {
+  animation: hang-fire 0.8s ease-in-out infinite;
+}
+
+/* 顶级 - 星光闪耀效果 */
+@keyframes ding-star {
+  0%, 100% { 
+    box-shadow: 0 0 8px #ffd700, 0 0 16px #ffb700;
+    filter: brightness(1);
+  }
+  50% { 
+    box-shadow: 0 0 16px #ffd700, 0 0 32px #ffb700, 0 0 48px #ff8c00;
+    filter: brightness(1.2);
+  }
+}
+
+.animate-ding {
+  animation: ding-star 1.5s ease-in-out infinite;
+}
+
+/* 人上人 - 霓虹光环效果 */
+@keyframes ren-neon {
+  0%, 100% { 
+    box-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff;
+  }
+  33% { 
+    box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
+  }
+  66% { 
+    box-shadow: 0 0 10px #00ccff, 0 0 20px #00ccff, 0 0 30px #00ccff;
+  }
+}
+
+.animate-ren {
+  animation: ren-neon 2s ease-in-out infinite;
+}
+
+/* NPC - 平淡无动画 */
+
+/* 拉 - 蝙蝠阴暗效果 */
+@keyframes la-bat {
+  0%, 100% { 
+    box-shadow: 0 0 8px #4b0082, 0 0 16px #2d0047;
+    transform: rotate(0deg);
+  }
+  25% { 
+    box-shadow: 0 0 12px #6a0dad, 0 0 20px #4b0082;
+    transform: rotate(-2deg);
+  }
+  50% { 
+    box-shadow: 0 0 16px #8b00ff, 0 0 24px #6a0dad;
+    transform: rotate(0deg);
+  }
+  75% { 
+    box-shadow: 0 0 12px #6a0dad, 0 0 20px #4b0082;
+    transform: rotate(2deg);
+  }
+}
+
+.animate-la {
+  animation: la-bat 1.2s ease-in-out infinite;
+}

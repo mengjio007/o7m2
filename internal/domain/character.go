@@ -33,6 +33,7 @@ type Character struct {
 	Status       CharacterStatus `json:"status" db:"status"`
 	CreatedAt    time.Time       `json:"created_at" db:"created_at"`
 	UpdatedAt    time.Time       `json:"updated_at" db:"updated_at"`
+	Rank         *RankInfo       `json:"rank,omitempty"`
 }
 
 func (c *Character) GetID() string {

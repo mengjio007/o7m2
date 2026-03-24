@@ -52,3 +52,15 @@ type Trade struct {
 	Tax         int64     `json:"tax" db:"tax"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 }
+
+type KLine struct {
+	ID          int64     `json:"id" db:"id"`
+	CharacterID string    `json:"character_id" db:"character_id"`
+	Period      string    `json:"period" db:"period"`
+	OpenTime    time.Time `json:"open_time" db:"open_time"`
+	OpenPrice   int64     `json:"open_price" db:"open_price"`
+	HighPrice   int64     `json:"high_price" db:"high_price"`
+	LowPrice    int64     `json:"low_price" db:"low_price"`
+	ClosePrice  int64     `json:"close_price" db:"close_price"`
+	Volume      int64     `json:"volume" db:"volume"`
+}
