@@ -167,64 +167,118 @@ export function Mining() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900">
-      {/* Header - 挖矿风格 */}
-      <header className="h-16 bg-gradient-to-r from-amber-600 to-orange-700 flex items-center px-6 justify-between">
-        <div className="flex items-center gap-6">
-          <a href="/" className="text-2xl font-bold text-white">
-            ⛏️ 偶气满满
-          </a>
-          <nav className="flex gap-2">
-            <a href="/" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm transition-all">
-              💹 交易
-            </a>
-            <a href="/mining" className="px-4 py-2 rounded-full bg-white/20 text-white text-sm font-medium">
-              挖矿
-            </a>
-            <a href="/wiki" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm transition-all">
-              📖 百科
-            </a>
-            <a href="/profile" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm transition-all">
-              👤 我的
-            </a>
+      {/* Header */}
+      <header className="h-12 md:h-16 bg-gradient-to-r from-amber-600 to-orange-700 flex items-center px-3 md:px-6 justify-between">
+        <div className="flex items-center gap-3 md:gap-6">
+          <a href="/" className="text-lg md:text-2xl font-bold text-white">⛏️ 偶气满满</a>
+          <nav className="hidden md:flex gap-2">
+            <a href="/" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm">💹 交易</a>
+            <a href="/mining" className="px-4 py-2 rounded-full bg-white/20 text-white text-sm">挖矿</a>
+            <a href="/wiki" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm">📖 百科</a>
+            <a href="/profile" className="px-4 py-2 rounded-full text-white/70 hover:bg-white/10 text-sm">👤 我的</a>
           </nav>
         </div>
-        <div className="flex items-center gap-4">
-          <a href="/profile" className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full hover:bg-white/20">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center text-lg">
-              {user?.avatar || '🎭'}
-            </div>
-            <span className="text-white text-sm">{user?.username}</span>
-          </a>
-        </div>
+        <a href="/profile" className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 bg-white/10 rounded-full">
+          <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center text-sm md:text-lg">{user?.avatar || '🎭'}</div>
+          <span className="hidden md:block text-white text-sm">{user?.username}</span>
+        </a>
       </header>
 
-      <div className="max-w-5xl mx-auto p-6">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-            ⛏️ 应援挖矿
-          </h1>
-          <p className="text-foreground/60">为你喜欢的角色应援，获取人气值奖励！</p>
+      <div className="max-w-5xl mx-auto p-3 md:p-6">
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">⛏️ 应援挖矿</h1>
+          <p className="text-white/60 text-sm md:text-base">为你喜欢的角色应援，获取人气值奖励！</p>
         </div>
 
         {holdings.length === 0 ? (
-          <div className="card-cute p-12 text-center">
-            <div className="text-6xl mb-4">📭</div>
-            <h2 className="text-xl font-bold mb-2">还没有持仓</h2>
-            <p className="text-foreground/60 mb-6">
-              你需要先持有角色的份额才能为其应援挖矿哦~
-            </p>
-            <a href="/" className="btn-primary">🛒 去交易</a>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 text-center text-white">
+            <div className="text-5xl md:text-6xl mb-4">📭</div>
+            <h2 className="text-lg md:text-xl font-bold mb-2">还没有持仓</h2>
+            <p className="text-white/60 mb-6 text-sm md:text-base">你需要先持有角色的份额才能为其应援挖矿哦~</p>
+            <a href="/" className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium">🛒 去交易</a>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-2 card-cute p-6">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <span>🎮</span> 选择应援角色
-              </h2>
-              <div className="grid grid-cols-3 gap-4">
+          <div className="flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-6">
+            {/* 角色选择 */}
+            <div className="md:col-span-2 bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+              <h2 className="text-base md:text-lg font-bold text-white mb-3 md:mb-4">🎮 选择应援角色</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {holdings.map((char) => (
                   <button
                     key={char.id}
+                    onClick={() => setSelectedCharacter(char)}
+                    className={`p-3 md:p-4 rounded-xl text-center transition-all ${
+                      selectedCharacter?.id === char.id
+                        ? 'bg-white/20 border-2 border-amber-400'
+                        : 'bg-white/5 border-2 border-transparent hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 md:mb-3 rounded-full bg-gradient-to-br from-amber-400/30 to-orange-400/30 flex items-center justify-center text-2xl md:text-3xl">{char.avatar}</div>
+                    <div className="font-bold text-white text-sm md:text-base">{char.name}</div>
+                    <div className="text-xs text-white/50">持仓: {char.holding}</div>
+                    {char.bonus > 0 && <div className="text-xs text-green-400">+{char.bonus}% 加成</div>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 控制面板 */}
+            <div className="space-y-3 md:space-y-4">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
+                <h3 className="text-sm font-bold text-white/60 mb-2 md:mb-3">当前应援</h3>
+                {selectedCharacter ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/10 flex items-center justify-center text-xl md:text-2xl">{selectedCharacter.avatar}</div>
+                    <div>
+                      <div className="font-bold text-white">{selectedCharacter.name}</div>
+                      <div className="text-xs text-green-400">+{selectedCharacter.bonus}% 产出加成</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center text-white/40 py-4">未选择角色</div>
+                )}
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4 space-y-2 md:space-y-3">
+                <div className="flex justify-between items-center"><span className="text-sm text-white/60">🎯 难度</span><span className="font-bold text-amber-400">{state.difficulty}</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm text-white/60">⚡ 算力</span><span className="font-bold text-white">{state.hashRate.toLocaleString()} H/s</span></div>
+                <div className="flex justify-between items-center"><span className="text-sm text-white/60">🔄 计算</span><span className="font-bold text-white">{state.attempts.toLocaleString()}</span></div>
+              </div>
+
+              {state.isMining && (
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
+                  <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all" style={{ width: `${Math.min((state.attempts / 100000) * 100, 100)}%` }} />
+                  </div>
+                  <div className="mt-2 text-xs text-center text-white/50">⏳ 计算中...</div>
+                </div>
+              )}
+
+              <button
+                onClick={state.isMining ? stopMining : startMining}
+                className={`w-full py-3 md:py-4 rounded-xl font-bold text-white text-base md:text-lg transition-all ${
+                  state.isMining ? 'bg-red-500 hover:bg-red-600' : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400'
+                }`}
+              >
+                {state.isMining ? '⏹️ 停止应援' : '🚀 开始应援'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 规则 */}
+        <div className="mt-6 md:mt-8 bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+          <h3 className="font-bold text-white mb-3 md:mb-4">💡 应援规则</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 text-sm text-white/70">
+            <div className="flex gap-3"><div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">🎯</div><div><div className="font-medium text-white">动态难度</div><div>全站每小时产出上限 10,000 人气值</div></div></div>
+            <div className="flex gap-3"><div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">📈</div><div><div className="font-medium text-white">持仓加成</div><div>持有角色份额可获得额外产出加成，最高 +50%</div></div></div>
+            <div className="flex gap-3"><div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">🛡️</div><div><div className="font-medium text-white">公平应援</div><div>反作弊机制确保每位用户的应援都是公平的</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
                     onClick={() => setSelectedCharacter(char)}
                     className={`p-4 rounded-cute text-center transition-all ${
                       selectedCharacter?.id === char.id
