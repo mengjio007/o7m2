@@ -8,16 +8,11 @@ interface Character {
   current_price: number
 }
 
-interface Ticker {
-  last_price: number
-}
-
 interface Props {
   character: Character | null
-  ticker: Ticker | null
 }
 
-export function TradingForm({ character, ticker }: Props) {
+export function TradingForm({ character }: Props) {
   const { isAuthenticated } = useAuthStore()
   const [side, setSide] = useState<'buy' | 'sell'>('buy')
   const [price, setPrice] = useState('')
@@ -54,7 +49,6 @@ export function TradingForm({ character, ticker }: Props) {
       alert('请先登录')
       return
     }
-
     setLoading(true)
     try {
       await tradingApi.createOrder({
@@ -74,42 +68,43 @@ export function TradingForm({ character, ticker }: Props) {
   }
 
   return (
-    <div className="h-full p-4 flex gap-4">
-      {/* 买入/卖出切换 */}
-      <div className="flex flex-col gap-2">
+    <div className="h-full flex flex-col">
+      {/* 买入卖出切换 */}
+      <div className="flex border-b border-white/10">
         <button
           onClick={() => setSide('buy')}
-          className={`px-6 py-3 rounded-cute font-medium transition-all ${
+          className={`flex-1 py-2.5 text-sm font-bold transition-all ${
             side === 'buy'
-              ? 'bg-gradient-to-r from-down to-down/80 text-white shadow-lg'
-              : 'bg-down/10 text-down hover:bg-down/20'
+              ? 'bg-green-500/20 text-green-400 border-b-2 border-green-400'
+              : 'text-white/50 hover:text-white/70'
           }`}
         >
           💰 买入
         </button>
         <button
           onClick={() => setSide('sell')}
-          className={`px-6 py-3 rounded-cute font-medium transition-all ${
+          className={`flex-1 py-2.5 text-sm font-bold transition-all ${
             side === 'sell'
-              ? 'bg-gradient-to-r from-up to-up/80 text-white shadow-lg'
-              : 'bg-up/10 text-up hover:bg-up/20'
+              ? 'bg-red-500/20 text-red-400 border-b-2 border-red-400'
+              : 'text-white/50 hover:text-white/70'
           }`}
         >
           💸 卖出
         </button>
       </div>
 
-      {/* 输入区域 */}
-      <div className="flex-1 grid grid-cols-2 gap-4">
+      {/* 内容区 */}
+      <div className="flex-1 p-3 flex flex-col gap-3">
         {/* 价格输入 */}
         <div>
-          <label className="block text-sm text-foreground/60 mb-2">
-            💲 价格 (人气值)
-          </label>
-          <div className="flex gap-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-white/50">价格</span>
+            <span className="text-xs text-white/30">可用: {balance.toLocaleString()}</span>
+          </div>
+          <div className="flex gap-1.5">
             <button 
               onClick={() => setPrice(String(Math.max(0, Math.round(Number(price) * 0.99))))}
-              className="px-3 py-2 bg-primary/10 text-primary rounded-cute text-sm hover:bg-primary/20 transition-all"
+              className="w-12 py-2 bg-white/5 text-white/70 rounded-lg text-xs hover:bg-white/10 border border-white/10"
             >
               -1%
             </button>
@@ -118,11 +113,11 @@ export function TradingForm({ character, ticker }: Props) {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="输入价格"
-              className="input-cute flex-1 text-center"
+              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-center text-sm placeholder-white/30 focus:border-purple-500/50 focus:outline-none"
             />
             <button 
               onClick={() => setPrice(String(Math.round(Number(price) * 1.01)))}
-              className="px-3 py-2 bg-primary/10 text-primary rounded-cute text-sm hover:bg-primary/20 transition-all"
+              className="w-12 py-2 bg-white/5 text-white/70 rounded-lg text-xs hover:bg-white/10 border border-white/10"
             >
               +1%
             </button>
@@ -131,10 +126,8 @@ export function TradingForm({ character, ticker }: Props) {
 
         {/* 数量输入 */}
         <div>
-          <label className="block text-sm text-foreground/60 mb-2">
-            📦 数量 (份额)
-          </label>
-          <div className="flex gap-2 mb-2">
+          <div className="text-xs text-white/50 mb-1.5">数量</div>
+          <div className="flex gap-1.5 mb-1.5">
             {[25, 50, 75, 100].map((pct) => (
               <button
                 key={pct}
@@ -142,11 +135,7 @@ export function TradingForm({ character, ticker }: Props) {
                   const maxQty = price ? Math.floor(balance / Number(price)) : 0
                   setQuantity(String(Math.floor(maxQty * pct / 100)))
                 }}
-                className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
-                  pct === 100 
-                    ? 'bg-accent/10 text-accent hover:bg-accent/20' 
-                    : 'bg-primary/5 text-foreground/60 hover:bg-primary/10'
-                }`}
+                className="flex-1 py-1.5 bg-white/5 text-white/60 rounded-lg text-xs hover:bg-white/10 border border-white/10"
               >
                 {pct}%
               </button>
@@ -157,22 +146,18 @@ export function TradingForm({ character, ticker }: Props) {
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="输入数量"
-            className="input-cute w-full text-center"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-center text-sm placeholder-white/30 focus:border-purple-500/50 focus:outline-none"
           />
         </div>
-      </div>
 
-      {/* 合计和提交 */}
-      <div className="w-48 flex flex-col justify-between">
         {/* 合计 */}
-        <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-cute p-4">
-          <div className="text-xs text-foreground/50 mb-1">💰 合计</div>
-          <div className="text-xl font-bold text-primary">
-            {totalAmount.toLocaleString()}
-            <span className="text-xs text-foreground/50 ml-1">人气值</span>
-          </div>
-          <div className="text-xs text-foreground/50 mt-2">
-            可用: {balance.toLocaleString()} 人气值
+        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-white/50">合计</span>
+            <span className="text-lg font-bold text-white">
+              {totalAmount.toLocaleString()}
+              <span className="text-xs text-white/40 ml-1">人气值</span>
+            </span>
           </div>
         </div>
 
@@ -180,14 +165,13 @@ export function TradingForm({ character, ticker }: Props) {
         <button
           onClick={handleSubmit}
           disabled={!character || loading}
-          className={`w-full py-3 rounded-cute font-bold text-white transition-all ${
+          className={`w-full py-3 rounded-xl font-bold text-white text-base transition-all ${
             side === 'buy'
-              ? 'bg-gradient-to-r from-down to-down/80 hover:shadow-lg hover:scale-105'
-              : 'bg-gradient-to-r from-up to-up/80 hover:shadow-lg hover:scale-105'
-          } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+              ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 shadow-lg shadow-green-500/20'
+              : 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 shadow-lg shadow-red-500/20'
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-          {loading ? '处理中...' : side === 'buy' ? '🚀 立即买入' : '💸 立即卖出'}
-          {character && ` ${character.name}`}
+          {loading ? '⏳ 处理中...' : side === 'buy' ? `🚀 买入 ${character?.name || ''}` : `💸 卖出 ${character?.name || ''}`}
         </button>
       </div>
     </div>

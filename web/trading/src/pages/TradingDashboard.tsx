@@ -219,7 +219,7 @@ export function TradingDashboard() {
             </div>
 
             {/* 交易表单 */}
-            <div className="h-36 md:h-44 bg-white/5 border-t border-white/10">
+            <div className="h-64 md:h-56 bg-white/5 border-t border-white/10">
               <TradingForm character={selectedCharacter} ticker={null} />
             </div>
           </div>
