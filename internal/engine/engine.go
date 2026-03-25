@@ -79,26 +79,7 @@ func (e *Engine) CancelOrder(characterID, orderID string) error {
 		return ErrCharacterNotFound
 	}
 
-	book.mu.Lock()
-	defer book.mu.Unlock()
-
-	for i, order := range book.Bids.orders {
-		if order.ID == orderID {
-			order.Status = domain.OrderStatusCancelled
-			book.Bids.orders = append(book.Bids.orders[:i], book.Bids.orders[i+1:]...)
-			return nil
-		}
-	}
-
-	for i, order := range book.Asks.orders {
-		if order.ID == orderID {
-			order.Status = domain.OrderStatusCancelled
-			book.Asks.orders = append(book.Asks.orders[:i], book.Asks.orders[i+1:]...)
-			return nil
-		}
-	}
-
-	return ErrOrderNotFound
+	return book.CancelOrder(orderID)
 }
 
 func (e *Engine) GetOrderBook(characterID string, depth int) ([]PriceLevel, []PriceLevel, error) {
