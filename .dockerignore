@@ -1,0 +1,11 @@
+.git
+.gotmp
+.gocache
+.gomodcache
+.gopath
+bin
+web
+*.md
+LICENSE
+models
+onnxruntime

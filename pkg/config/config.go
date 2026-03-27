@@ -1,4 +1,4 @@
-package config
+﻿package config
 
 import (
 	"os"
@@ -16,6 +16,7 @@ type ServerConfig struct {
 	MatchPort string
 	MinerPort string
 	AdminPort string
+	ChatPort  string
 }
 
 type DatabaseConfig struct {
@@ -45,6 +46,7 @@ func Load() *Config {
 			MatchPort: getEnv("MATCH_PORT", "8081"),
 			MinerPort: getEnv("MINER_PORT", "8082"),
 			AdminPort: getEnv("ADMIN_PORT", "8083"),
+			ChatPort:  getEnv("CHAT_PORT", "8084"),
 		},
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
@@ -72,3 +74,4 @@ func getEnv(key, defaultValue string) string {
 	}
 	return defaultValue
 }
+

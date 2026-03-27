@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
 import { characterApi } from '@/services/api'
+import { CharacterChat } from '@/components/Wiki/CharacterChat'
 
 interface Character {
   id: string
@@ -244,6 +245,7 @@ export function Wiki() {
       <footer className="mt-8 py-4 md:py-6 bg-white border-t text-center text-gray-400 text-xs md:text-sm">
         © 2026 偶气百科 - 二次元人气交易所
       </footer>
+      <CharacterChat characterId={character?.id || charId} characterName={character?.name} />
     </div>
   )
 }

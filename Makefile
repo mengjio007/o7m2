@@ -1,4 +1,4 @@
-.PHONY: all build run clean dev docker-up docker-down
+﻿.PHONY: all build run clean dev docker-up docker-down
 
 # Build all services
 all: build
@@ -10,6 +10,7 @@ build:
 	go build -o bin/match ./cmd/match
 	go build -o bin/miner ./cmd/miner
 	go build -o bin/admin ./cmd/admin
+\tgo build -o bin/chat ./cmd/chat
 
 # Run all services locally
 run-api:
@@ -22,9 +23,11 @@ run-miner:
 	go run ./cmd/miner
 
 run-admin:
-	go run ./cmd/admin
+\tgo run ./cmd/admin
 
-# Development with docker
+run-chat:
+\tgo run ./cmd/chat
+\n# Development with docker
 docker-up:
 	docker-compose up -d
 
@@ -72,3 +75,4 @@ help:
 	@echo "  make tidy           - Run go mod tidy"
 	@echo "  make frontend-dev   - Start frontend dev server"
 	@echo "  make clean          - Clean build artifacts"
+

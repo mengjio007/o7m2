@@ -1,4 +1,4 @@
-# Build stage
+﻿# Build stage
 FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
@@ -13,6 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/api ./cmd/api
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/match ./cmd/match
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/miner ./cmd/miner
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/admin ./cmd/admin
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/chat ./cmd/chat
 
 # Runtime stage
 FROM alpine:latest
@@ -24,6 +25,7 @@ WORKDIR /app
 COPY --from=builder /app/bin ./bin
 COPY --from=builder /app/migrations ./migrations
 
-EXPOSE 8080 8081 8082 8083
+EXPOSE 8080 8081 8082 8083 8084
 
 CMD ["./bin/api"]
+

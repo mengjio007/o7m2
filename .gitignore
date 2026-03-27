@@ -1,4 +1,4 @@
-# Binaries for programs and plugins
+﻿# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
@@ -42,3 +42,14 @@ build/
 # Database
 *.db
 *.sqlite
+
+
+# Local Go caches (sandbox)
+.gocache/
+.gomodcache/
+.gopath/
+.gotmp/
+
+# Downloaded model artifacts
+models/
+onnxruntime/

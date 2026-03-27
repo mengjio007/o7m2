@@ -1,0 +1,41 @@
+# Build stage (needs CGO for onnxruntime_go)
+FROM golang:1.23-bookworm AS builder
+
+WORKDIR /app
+
+ENV GOPROXY=https://goproxy.cn,direct
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+# Build chat with ONNX support
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -tags onnx -o ./bin/chat ./cmd/chat
+
+# Runtime stage (glibc-based for official onnxruntime builds)
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Download and install onnxruntime from mirror
+RUN wget -q https://ghfast.top/https://github.com/microsoft/onnxruntime/releases/download/v1.19.0/onnxruntime-linux-x64-1.19.0.tgz -O /tmp/onnxruntime.tgz && \
+    tar -xzf /tmp/onnxruntime.tgz -C /opt/ && \
+    mv /opt/onnxruntime-linux-x64-1.19.0 /opt/onnxruntime && \
+    rm /tmp/onnxruntime.tgz
+
+COPY --from=builder /app/bin/chat ./bin/chat
+
+# Set onnxruntime library path
+ENV LD_LIBRARY_PATH=/opt/onnxruntime/lib:$LD_LIBRARY_PATH
+ENV CHAT_ONNXRUNTIME_SHARED_LIBRARY_PATH=/opt/onnxruntime/lib/libonnxruntime.so.1.19.0
+
+# Default locations (override with env in docker-compose)
+ENV CHAT_PORT=8084
+
+EXPOSE 8084
+
+CMD ["./bin/chat"]
+
