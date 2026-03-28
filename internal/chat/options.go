@@ -56,7 +56,7 @@ func LoadOptionsFromEnv() Options {
 	maxTurns := int(envInt64("CHAT_MAX_HISTORY_TURNS", 20))
 	maxMsgChars := int(envInt64("CHAT_MAX_MESSAGE_CHARS", 2000))
 	maxInferConc := int(envInt64("CHAT_MAX_INFER_CONCURRENCY", 4))
-	inferTimeout := envDurationMillis("CHAT_INFER_TIMEOUT_MS", 20_000)
+	inferTimeout := envDurationMillis("CHAT_INFER_TIMEOUT_MS", 120_000)
 
 	return Options{
 		MaxSessions:         maxSessions,
@@ -82,8 +82,8 @@ func LoadOptionsFromEnv() Options {
 		OnnxEmbedModelPath:   os.Getenv("CHAT_ONNX_EMBED_MODEL_PATH"),
 		OnnxDecoderModelPath: os.Getenv("CHAT_ONNX_DECODER_MODEL_PATH"),
 
-		OnnxMaxInputTokens:   int(envInt64("CHAT_ONNX_MAX_INPUT_TOKENS", 2048)),
-		OnnxMaxOutputTokens:  int(envInt64("CHAT_ONNX_MAX_OUTPUT_TOKENS", 512)),
+		OnnxMaxInputTokens:   int(envInt64("CHAT_ONNX_MAX_INPUT_TOKENS", 1024)),
+		OnnxMaxOutputTokens:  int(envInt64("CHAT_ONNX_MAX_OUTPUT_TOKENS", 128)),
 		OnnxEosTokenID:       envInt64("CHAT_ONNX_EOS_TOKEN_ID", 0),
 		OnnxPadTokenID:       envInt64("CHAT_ONNX_PAD_TOKEN_ID", 0),
 		OnnxTokenOffset:      envInt64("CHAT_ONNX_TOKEN_OFFSET", 1),

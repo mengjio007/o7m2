@@ -60,12 +60,20 @@ func (e *ONNXEngine) Generate(ctx context.Context, prompt string) (string, error
 	switch v := outputs[0].(type) {
 	case *ort.Tensor[int64]:
 		outIDs := v.GetData()
-		return byteDetokenize(outIDs, e.opt), nil
+		out := byteDetokenize(outIDs, e.opt)
+		if !e.opt.OnnxReturnFullOutput {
+			out = SanitizeAssistantReply(prompt, out)
+		}
+		return out, nil
 	case *ort.Tensor[float32]:
 		if e.opt.OnnxOutputLogitsVocab <= 0 {
 			return "", fmt.Errorf("model returned float32 tensor; set CHAT_ONNX_OUTPUT_LOGITS_VOCAB to decode logits")
 		}
-		return decodeFloat32Logits(v.GetData(), e.opt), nil
+		out := decodeFloat32Logits(v.GetData(), e.opt)
+		if !e.opt.OnnxReturnFullOutput {
+			out = SanitizeAssistantReply(prompt, out)
+		}
+		return out, nil
 	default:
 		return "", fmt.Errorf("unsupported onnx output type %T (only int64 tokens or float32 logits supported)", outputs[0])
 	}

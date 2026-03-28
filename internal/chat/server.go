@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -60,7 +61,7 @@ func NewServer(deps ServerDeps) (*Server, error) {
 			CheckOrigin:     func(r *http.Request) bool { return true },
 		},
 	}
-	// AdmissionQueue 会在循环里调用 LeaseManager.Acquire。
+	// AdmissionQueue ÃƒÆ’Ã‚Â¤Ãƒâ€šÃ‚Â¼Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã‚Â¥Ãƒâ€¦Ã¢â‚¬Å“Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â¾Ãƒâ€šÃ‚ÂªÃƒÆ’Ã‚Â§Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã‚Â©ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡Ãƒâ€¦Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚Â°Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â§ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¨ LeaseManager.AcquireÃƒÆ’Ã‚Â£ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡
 	s.queue = NewAdmissionQueue(s.lease, deps.Clock, deps.Options.QueueRetryInterval, deps.Options.MaxWait)
 	return s, nil
 }
@@ -92,7 +93,7 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// 10 秒内必须 init
+	// 10 ÃƒÆ’Ã‚Â§Ãƒâ€šÃ‚Â§ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã‚Â¥ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â¿ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â©Ãƒâ€šÃ‚Â¡Ãƒâ€šÃ‚Â» init
 	_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	_, initBytes, err := conn.ReadMessage()
 	if err != nil {
@@ -229,10 +230,18 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 			sess = trimHistory(sess, s.opt.MaxHistoryTurns)
 
 			trend, _ := s.trends.GetTrend(ctx, init.CharacterID)
-			prompt := BuildPrompt(char, trend, sess.History, text)
+			historyForPrompt := sess.History
+			if n := len(historyForPrompt); n > 0 {
+				last := historyForPrompt[n-1]
+				if last.Role == RoleUser && last.Text == text {
+					historyForPrompt = historyForPrompt[:n-1]
+				}
+			}
+			prompt := BuildPrompt(char, trend, historyForPrompt, text)
 
 			resp, err := s.infer.Generate(ctx, prompt)
 			if err != nil {
+				log.Printf("inference error: %v", err)
 				if errors.Is(err, ErrInferBusy) {
 					_ = conn.WriteJSON(gin.H{"type": "error", "code": "BUSY", "message": "inference busy"})
 					continue
@@ -241,6 +250,13 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 				continue
 			}
 
+			resp = SanitizeAssistantReply(prompt, resp)
+			if IsDegenerateAssistantReply(text, resp) {
+				resp = "……你好。我在。想聊聊我现在的走势和情绪吗？"
+				if trend != nil && strings.TrimSpace(trend.TrendLabel) != "" {
+					resp = "……你好。我在。" + "我现在更像是" + trend.TrendLabel + "的节奏。想继续聊聊吗？"
+				}
+			}
 			_ = conn.WriteJSON(gin.H{"type": "assistant_delta", "text": resp})
 			_ = conn.WriteJSON(gin.H{"type": "assistant_done"})
 
@@ -335,10 +351,18 @@ func (s *Server) HandleHTTPChat(c *gin.Context) {
 	sess = trimHistory(sess, s.opt.MaxHistoryTurns)
 
 	trend, _ := s.trends.GetTrend(ctx, req.CharacterID)
-	prompt := BuildPrompt(char, trend, sess.History, text)
+	historyForPrompt := sess.History
+	if n := len(historyForPrompt); n > 0 {
+		last := historyForPrompt[n-1]
+		if last.Role == RoleUser && last.Text == text {
+			historyForPrompt = historyForPrompt[:n-1]
+		}
+	}
+	prompt := BuildPrompt(char, trend, historyForPrompt, text)
 
 	resp, err := s.infer.Generate(ctx, prompt)
 	if err != nil {
+		log.Printf("inference error: %v", err)
 		if errors.Is(err, ErrInferBusy) {
 			c.JSON(429, gin.H{"error": "busy", "message": "inference busy"})
 			return
@@ -347,6 +371,13 @@ func (s *Server) HandleHTTPChat(c *gin.Context) {
 		return
 	}
 
+	resp = SanitizeAssistantReply(prompt, resp)
+	if IsDegenerateAssistantReply(text, resp) {
+		resp = "……你好。我在。想聊聊我现在的走势和情绪吗？"
+		if trend != nil && strings.TrimSpace(trend.TrendLabel) != "" {
+			resp = "……你好。我在。" + "我现在更像是" + trend.TrendLabel + "的节奏。想继续聊聊吗？"
+		}
+	}
 	sess = appendAssistant(sess, resp, s.clock.Now())
 	_ = s.store.Put(ctx, sess, s.opt.SessionTTL)
 

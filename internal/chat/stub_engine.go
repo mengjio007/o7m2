@@ -18,6 +18,10 @@ func (e *StubEngine) Generate(ctx context.Context, prompt string) (string, error
 		userText = strings.TrimSpace(prompt[i+len("[用户问题]"):])
 	}
 
+	if j := strings.LastIndex(userText, "\n\nAssistant:"); j >= 0 {
+		userText = strings.TrimSpace(userText[:j])
+	}
+
 	if looksOffTopic(userText) {
 		return "我先不聊那些啦。我们还是回到我这只“股票”的状态：你更关心我接下来是继续上冲、横盘，还是回踩？", nil
 	}

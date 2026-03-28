@@ -39,5 +39,6 @@ func BuildPrompt(char *domain.Character, trend *TrendSnapshot, history []Message
 	b.WriteString("[用户问题]\n")
 	b.WriteString(userText)
 	b.WriteString("\n")
+	b.WriteString("\n\nAssistant:")
 	return b.String()
 }

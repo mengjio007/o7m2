@@ -1,4 +1,4 @@
-﻿-- KEYS[1] = zset key
+-- KEYS[1] = zset key
 -- ARGV[1] = now_ms
 -- ARGV[2] = expire_ms
 -- ARGV[3] = session_id
