@@ -17,18 +17,26 @@ o7m2/
 │   ├── api/               # API 网关 (端口 8080)
 │   ├── match/             # 撮合引擎 (端口 8081)
 │   ├── miner/             # 挖矿服务 (端口 8082)
-│   └── admin/             # 管理后台 (端口 8083)
+│   ├── admin/             # 管理后台 (端口 8083)
+│   └── chat/              # AI聊天服务 (端口 8084)
 ├── internal/              # 核心业务逻辑
 │   ├── domain/            # 领域模型
 │   ├── engine/            # 撮合引擎
 │   ├── service/           # 业务服务层
 │   ├── handler/           # HTTP 处理器
-│   └── repository/        # 数据访问层
+│   ├── repository/        # 数据访问层
+│   └── chat/              # AI聊天服务
+│       ├── server.go      # WebSocket/HTTP 服务器
+│       ├── engine*.go     # ONNX 推理引擎
+│       ├── prompt.go      # 提示词构建
+│       ├── trend.go       # 行情趋势分析
+│       └── ...            # 会话管理、并发控制等
 ├── pkg/                   # 公共包
 ├── proto/                 # gRPC 协议定义
 ├── web/                   # 前端项目
 │   ├── trading/           # 交易前端 (端口 3000)
 │   └── admin/             # 管理后台 (端口 3001)
+├── models/                # AI 模型文件
 ├── migrations/            # 数据库迁移
 └── docker-compose.yml     # Docker 配置
 ```
@@ -41,6 +49,7 @@ o7m2/
 - gRPC (服务间通信)
 - MySQL 8.0 (数据存储)
 - Redis 7 (缓存/消息)
+- ONNX Runtime (AI 推理引擎)
 
 ### 前端
 - React 18
@@ -59,6 +68,9 @@ docker-compose up -d
 
 # 查看日志
 docker-compose logs -f
+
+# 重新编译并启动 chat 服务
+docker-compose up -d --build chat
 ```
 
 ### 本地开发
@@ -75,6 +87,7 @@ make run-api      # API 服务
 make run-match    # 撮合引擎
 make run-miner    # 挖矿服务
 make run-admin    # 管理后台
+make run-chat     # AI 聊天服务
 
 # 4. 启动前端
 cd web/trading && npm install && npm run dev
@@ -195,7 +208,115 @@ const mine = (sessionId, difficulty) => {
 }
 ```
 
-### 5. 全站大事件
+### 5. AI 角色聊天 (Chat) 💬
+
+基于 ONNX Runtime 的本地 AI 推理引擎，用户可以与虚拟角色进行实时对话。
+
+#### 核心特性
+
+- **本地 AI 推理**：使用 ONNX Runtime 运行量化模型，无需依赖外部 API
+- **实时 WebSocket 通信**：支持双向实时聊天，低延迟响应
+- **HTTP API 兼容**：同时支持 HTTP POST 请求进行聊天
+- **会话管理**：支持会话持久化、空闲超时、自动续期
+- **趋势感知**：角色回复会参考实时行情数据，体现"股票化人格"
+- **并发控制**：通过租赁机制和队列管理，防止服务器过载
+- **提示词工程**：构建包含角色设定、行情快照、对话历史的智能提示词
+
+#### 系统提示词规则
+
+角色聊天遵循严格的"股票化人格"规则：
+1. 角色用第一人称回答，保持角色设定
+2. 聊天范围限定：角色设定、行情走势/交易情绪、互动建议
+3. 无关话题会被礼貌拒绝并引导回角色/走势
+4. 行情数据以提供的"行情快照"为准，不编造硬数据
+
+#### 技术架构
+
+```
+用户请求
+    ↓
+WebSocket/HTTP Server (端口 8084)
+    ↓
+会话管理 (Redis 存储)
+    ↓
+租赁机制 (并发控制)
+    ↓
+趋势分析 (K线数据 → 行情快照)
+    ↓
+提示词构建 (系统提示 + 角色设定 + 行情 + 历史)
+    ↓
+ONNX 推理引擎 (本地模型推理)
+    ↓
+响应清理 (去重、格式化)
+    ↓
+返回用户
+```
+
+#### 环境配置
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `CHAT_MODEL_PATH` | - | 模型目录路径 |
+| `CHAT_ONNXRUNTIME_SHARED_LIBRARY_PATH` | - | ONNX Runtime 库路径 |
+| `CHAT_MAX_SESSIONS` | 200 | 最大并发会话数 |
+| `CHAT_LEASE_TTL_SEC` | 45 | 会话租赁超时(秒) |
+| `CHAT_IDLE_TIMEOUT_SEC` | 900 | 空闲超时(15分钟) |
+| `CHAT_MAX_HISTORY_TURNS` | 20 | 最大历史轮次 |
+| `CHAT_MAX_MESSAGE_CHARS` | 2000 | 单条消息最大字符数 |
+| `CHAT_INFER_TIMEOUT_MS` | 120000 | 推理超时(2分钟) |
+
+#### API 接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/ws/chat` | WebSocket | 实时聊天连接 |
+| `/api/chat` | POST | HTTP 聊天接口 |
+| `/health` | GET | 健康检查 |
+
+#### WebSocket 协议
+
+**初始化消息**：
+```json
+{
+  "type": "init",
+  "token": "用户JWT令牌",
+  "character_id": "角色ID",
+  "session_id": "会话ID(可选)"
+}
+```
+
+**用户消息**：
+```json
+{
+  "type": "user_message",
+  "text": "聊天内容",
+  "client_msg_id": "客户端消息ID(可选)"
+}
+```
+
+**服务器响应**：
+- `ready`：会话就绪，包含角色信息和限制
+- `assistant_delta`：AI 回复内容
+- `assistant_done`：回复完成
+- `error`：错误信息
+- `queued`：排队等待
+
+#### 行情快照数据
+
+聊天时会实时获取角色行情数据，包括：
+- 最新价格、1h/24h 涨跌幅
+- 1h 最高/最低价、成交量
+- MA5/MA20 均线
+- 趋势标签：上行/下行/震荡
+
+#### 并发控制机制
+
+1. **租赁机制**：每个会话需要获取租赁才能进行推理
+2. **队列等待**：超出并发限制时，请求进入等待队列
+3. **超时管理**：租赁超时自动释放，防止死锁
+4. **心跳保活**：定期刷新租赁，保持会话活跃
+
+### 6. 全站大事件
 - 市场异常预警
 - 限时活动
 - 系统公告
@@ -222,6 +343,7 @@ const mine = (sessionId, difficulty) => {
 | Match | 8081 | 撮合引擎 gRPC |
 | Miner | 8082 | 挖矿服务 |
 | Admin | 8083 | 管理后台 |
+| Chat | 8084 | AI 聊天服务 |
 | Trading Web | 3000 | 交易前端 |
 | Admin Web | 3001 | 管理后台前端 |
 
