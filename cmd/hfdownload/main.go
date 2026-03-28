@@ -49,7 +49,7 @@ func main() {
 
 	allowed := make(map[string]bool)
 	for _, f := range files {
-		if strings.HasPrefix(f, "onnx/") {
+		if strings.HasPrefix(f, "onnx/") || strings.HasSuffix(strings.ToLower(f), ".onnx") {
 			allowed[f] = true
 		}
 	}

@@ -28,11 +28,13 @@ type Options struct {
 	// - "auto": if ModelPath is a directory containing HF-style exports, use GPT2 BPE.
 	// - "byte": use the simple byte-token engine (prompt->tokens).
 	// - "gpt2": force GPT2 BPE (vocab.json + merges.txt).
-	OnnxTokenizer        string
-	OnnxVocabJSONPath    string
-	OnnxMergesPath       string
-	OnnxEmbedModelPath   string
-	OnnxDecoderModelPath string
+	OnnxTokenizer         string
+	OnnxVocabJSONPath     string
+	OnnxMergesPath        string
+	OnnxEmbedModelPath    string
+	OnnxDecoderModelPath  string
+	OnnxModelFilePath     string
+	OnnxTokenizerJSONPath string
 
 	OnnxMaxInputTokens    int
 	OnnxMaxOutputTokens   int
@@ -76,11 +78,13 @@ func LoadOptionsFromEnv() Options {
 		OnnxPromptInput:       envString("CHAT_ONNX_PROMPT_INPUT", "prompt"),
 		OnnxResponseOutput:    envString("CHAT_ONNX_RESPONSE_OUTPUT", "response"),
 
-		OnnxTokenizer:        envString("CHAT_ONNX_TOKENIZER", "auto"),
-		OnnxVocabJSONPath:    os.Getenv("CHAT_ONNX_VOCAB_JSON"),
-		OnnxMergesPath:       os.Getenv("CHAT_ONNX_MERGES_TXT"),
-		OnnxEmbedModelPath:   os.Getenv("CHAT_ONNX_EMBED_MODEL_PATH"),
-		OnnxDecoderModelPath: os.Getenv("CHAT_ONNX_DECODER_MODEL_PATH"),
+		OnnxTokenizer:         envString("CHAT_ONNX_TOKENIZER", "auto"),
+		OnnxVocabJSONPath:     os.Getenv("CHAT_ONNX_VOCAB_JSON"),
+		OnnxMergesPath:        os.Getenv("CHAT_ONNX_MERGES_TXT"),
+		OnnxEmbedModelPath:    os.Getenv("CHAT_ONNX_EMBED_MODEL_PATH"),
+		OnnxDecoderModelPath:  os.Getenv("CHAT_ONNX_DECODER_MODEL_PATH"),
+		OnnxModelFilePath:     os.Getenv("CHAT_ONNX_MODEL_FILE"),
+		OnnxTokenizerJSONPath: os.Getenv("CHAT_ONNX_TOKENIZER_JSON"),
 
 		OnnxMaxInputTokens:   int(envInt64("CHAT_ONNX_MAX_INPUT_TOKENS", 1024)),
 		OnnxMaxOutputTokens:  int(envInt64("CHAT_ONNX_MAX_OUTPUT_TOKENS", 128)),

@@ -5,6 +5,7 @@ package chat
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -35,6 +36,14 @@ func NewEngineFromOptions(opt Options) (Engine, error) {
 	mode := strings.ToLower(strings.TrimSpace(opt.OnnxTokenizer))
 	st, err := os.Stat(opt.ModelPath)
 	if err == nil && st.IsDir() {
+		// Llama-style single-model exports (e.g. llmware/*-onnx) commonly ship
+		// `model.onnx` + `tokenizer.json` at the root.
+		if _, err := os.Stat(filepath.Join(opt.ModelPath, "model.onnx")); err == nil {
+			if _, err := os.Stat(filepath.Join(opt.ModelPath, "tokenizer.json")); err == nil {
+				return NewLlamaChatONNXEngine(opt)
+			}
+		}
+
 		if mode == "auto" || mode == "gpt2" {
 			return NewLlavaInterleaveQwenONNXEngine(opt)
 		}
